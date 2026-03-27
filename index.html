@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>H2Sports</title>
+
+  <style>
+    :root{
+      --bg:#0a0f1f;
+      --bg-2:#11182c;
+      --card:#151e35;
+      --card-2:#1c2745;
+      --line:rgba(255,255,255,.08);
+      --text:#f4f7fb;
+      --muted:#aab6d1;
+      --primary:#11c76f;
+      --primary-2:#0ea35b;
+      --accent:#29b6f6;
+      --danger:#ff5f5f;
+      --shadow:0 12px 30px rgba(0,0,0,.28);
+      --radius:20px;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background:
+        radial-gradient(circle at top right, rgba(17,199,111,.16), transparent 26%),
+        radial-gradient(circle at left bottom, rgba(41,182,246,.12), transparent 25%),
+        linear-gradient(180deg, #08101d 0%, #0d1426 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    a{
+      text-decoration:none;
+      color:inherit;
+    }
+
+    .app{
+      display:flex;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      width:280px;
+      background:rgba(7,12,24,.95);
+      border-right:1px solid var(--line);
+      backdrop-filter: blur(10px);
+      padding:22px 18px;
+      position:fixed;
+      inset:0 auto 0 0;
+      z-index:50;
+      transform:translateX(0);
+      transition:.28s ease;
+      box-shadow:var(--shadow);
+    }
+
+    .sidebar.closed{
+      transform:translateX(-100%);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:28px;
+      padding:10px 8px;
+    }
+
+    .brand-logo{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      background:linear-gradient(135deg, var(--primary), var(--accent));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:22px;
+      font-weight:700;
+      color:#041018;
+      box-shadow:0 10px 25px rgba(17,199,111,.25);
+    }
+
+    .brand-text h1{
+      font-size:24px;
+      line-height:1;
+    }
+
+    .brand-text span{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .menu{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .menu a{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:16px;
+      color:var(--text);
+      transition:.2s ease;
+      border:1px solid transparent;
+      background:transparent;
+    }
+
+    .menu a:hover,
+    .menu a.active{
+      background:linear-gradient(180deg, rgba(17,199,111,.14), rgba(41,182,246,.10));
+      border-color:rgba(17,199,111,.18);
+      transform:translateX(2px);
+    }
+
+    .menu .icon{
+      width:20px;
+      text-align:center;
+      font-size:18px;
+    }
+
+    .content{
+      flex:1;
+      margin-left:280px;
+      width:calc(100% - 280px);
+      transition:.28s ease;
+    }
+
+    .content.full{
+      margin-left:0;
+      width:100%;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px 24px;
+      background:rgba(10,15,31,.72);
+      border-bottom:1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .left-topbar{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .hamburger{
+      border:none;
+      background:linear-gradient(180deg, #15213c, #0f1930);
+      color:white;
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .page-title{
+      font-size:26px;
+      font-weight:700;
+      letter-spacing:.4px;
+    }
+
+    .hero-chip{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(17,199,111,.12);
+      color:#9cf1c5;
+      border:1px solid rgba(17,199,111,.24);
+      font-size:13px;
+      font-weight:700;
+    }
+
+    .page{
+      padding:28px 24px 40px;
+      display:none;
+    }
+
+    .page.active{
+      display:block;
+      animation:fade .25s ease;
+    }
+
+    @keyframes fade{
+      from{opacity:0; transform:translateY(8px);}
+      to{opacity:1; transform:translateY(0);}
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:22px;
+      margin-bottom:26px;
+    }
+
+    .hero-main{
+      background:
+        linear-gradient(135deg, rgba(17,199,111,.16), rgba(41,182,246,.11)),
+        linear-gradient(180deg, #131d34, #0f172b);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:32px;
+      box-shadow:var(--shadow);
+      min-height:280px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+
+    .hero-main h2{
+      font-size:40px;
+      line-height:1.05;
+      margin-bottom:14px;
+    }
+
+    .hero-main p{
+      color:var(--muted);
+      font-size:16px;
+      max-width:680px;
+      line-height:1.6;
+      margin-bottom:22px;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding:14px 18px;
+      border-radius:14px;
+      font-weight:700;
+      transition:.2s ease;
+    }
+
+    .btn-primary{
+      background:linear-gradient(180deg, var(--primary), var(--primary-2));
+      color:#03170d;
+    }
+
+    .btn-primary:hover{
+      transform:translateY(-1px);
+      filter:brightness(1.05);
+    }
+
+    .btn-secondary{
+      background:#192440;
+      color:#fff;
+      border:1px solid var(--line);
+    }
+
+    .btn-secondary:hover{
+      background:#202d4f;
+    }
+
+    .hero-side{
+      display:grid;
+      gap:16px;
+    }
+
+    .small-card{
+      background:linear-gradient(180deg, #121c32, #0f182c);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .small-card h3{
+      margin-bottom:8px;
+      font-size:18px;
+    }
+
+    .small-card p{
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin:18px 0 16px;
+    }
+
+    .section-title h3{
+      font-size:24px;
+    }
+
+    .section-title span{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .products-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+      gap:18px;
+    }
+
+    .product-card{
+      background:linear-gradient(180deg, #121c31, #0e1629);
+      border:1px solid var(--line);
+      border-radius:24px;
+      overflow:hidden;
+      box-shadow:var(--shadow);
+      transition:.25s ease;
+      cursor:pointer;
+    }
+
+    .product-card:hover{
+      transform:translateY(-4px);
+      border-color:rgba(17,199,111,.26);
+    }
+
+    .product-image{
+      height:260px;
+      background:#0a1122;
+      overflow:hidden;
+    }
+
+    .product-image img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .product-body{
+      padding:18px;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(41,182,246,.14);
+      color:#9fdfff;
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:12px;
+    }
+
+    .product-title{
+      font-size:19px;
+      margin-bottom:8px;
+    }
+
+    .product-desc{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      min-height:44px;
+    }
+
+    .product-footer{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top:16px;
+    }
+
+    .price{
+      font-size:24px;
+      font-weight:800;
+      color:#fff;
+    }
+
+    .product-detail{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+    }
+
+    .gallery{
+      background:linear-gradient(180deg, #121c31, #0e1629);
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .main-photo{
+      height:480px;
+      border-radius:22px;
+      overflow:hidden;
+      background:#0a1122;
+      margin-bottom:14px;
+    }
+
+    .main-photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .thumbs{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+    }
+
+    .thumb{
+      height:110px;
+      border-radius:16px;
+      overflow:hidden;
+      cursor:pointer;
+      border:2px solid transparent;
+      background:#0a1122;
+    }
+
+    .thumb.active{
+      border-color:var(--primary);
+    }
+
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .detail-card{
+      background:linear-gradient(180deg, #121c31, #0e1629);
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+
+    .detail-card h2{
+      font-size:34px;
+      margin-bottom:8px;
+    }
+
+    .detail-card .desc{
+      color:var(--muted);
+      line-height:1.7;
+      margin:14px 0 20px;
+    }
+
+    .info-line{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 0;
+      border-top:1px solid var(--line);
+      font-size:15px;
+    }
+
+    .form-section{
+      margin-top:22px;
+      padding-top:18px;
+      border-top:1px solid var(--line);
+    }
+
+    .form-title{
+      font-size:18px;
+      margin-bottom:14px;
+    }
+
+    .sizes{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .size-btn{
+      min-width:58px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#18233f;
+      color:white;
+      cursor:pointer;
+      font-weight:700;
+      transition:.2s ease;
+    }
+
+    .size-btn.active{
+      background:linear-gradient(180deg, var(--primary), var(--primary-2));
+      color:#05150d;
+      border-color:transparent;
+    }
+
+    .field{
+      margin-bottom:14px;
+    }
+
+    .field{
+  display:flex;
+  flex-direction:column;
+}
+
+.field label{
+  display:block;
+  margin-bottom:6px;
+  font-weight:700;
+  font-size:14px;
+  color:#dfe8fb;
+}
+
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      padding:14px 14px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:#17233e;
+      color:white;
+      outline:none;
+      font-size:15px;
+    }
+
+    .payment-options{
+      display:grid;
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .payment-option{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#17233e;
+      cursor:pointer;
+    }
+
+    .payment-option input{
+      accent-color:var(--primary);
+      transform:scale(1.15);
+    }
+
+    .payment-box{
+      margin-top:16px;
+      background:rgba(17,199,111,.10);
+      border:1px solid rgba(17,199,111,.25);
+      color:#cbffe4;
+      padding:16px;
+      border-radius:16px;
+      line-height:1.6;
+      display:none;
+    }
+
+    .payment-box.show{
+      display:block;
+    }
+
+    .orders-wrap,
+    .payment-wrap{
+      display:grid;
+      gap:18px;
+    }
+
+    .panel{
+      background:linear-gradient(180deg, #121c31, #0e1629);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:22px;
+      box-shadow:var(--shadow);
+    }
+
+    .panel h3{
+      font-size:22px;
+      margin-bottom:12px;
+    }
+
+    .panel p{
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .pay-cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+      gap:18px;
+      margin-top:10px;
+    }
+
+    .pay-card{
+      padding:20px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #16203a, #10192e);
+    }
+
+    .pay-card h4{
+      font-size:20px;
+      margin-bottom:10px;
+    }
+
+    .pay-card p{
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .order-item{
+  border:1px solid var(--line);
+  background:#121c31;
+  border-radius:20px;
+  padding:18px;
+  display:grid;
+  gap:8px;
+  position:relative;
+  padding-bottom:64px;
+}
+
+    .remove-order-btn{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  border:none;
+  cursor:pointer;
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:700;
+  background:linear-gradient(180deg, #ff6b6b, #d94b4b);
+  color:white;
+  transition:.2s ease;
+}
+
+.remove-order-btn:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.05);
+}
+
+    .order-item .order-title{
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .order-meta{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .empty-state{
+      padding:36px;
+      text-align:center;
+      color:var(--muted);
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius:24px;
+      background:rgba(255,255,255,.02);
+    }
+
+    .success-toast{
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      z-index:100;
+      background:linear-gradient(180deg, #16b364, #109654);
+      color:#04140c;
+      padding:16px 18px;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      font-weight:800;
+      opacity:0;
+      pointer-events:none;
+      transform:translateY(12px);
+      transition:.25s ease;
+    }
+
+    .success-toast.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.35);
+      z-index:40;
+      display:none;
+    }
+
+    .overlay.show{
+      display:block;
+    }
+
+    .footer-note{
+      margin-top:22px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    @media (max-width: 1100px){
+      .hero,
+      .product-detail{
+        grid-template-columns:1fr;
+      }
+
+      .main-photo{
+        height:380px;
+      }
+    }
+
+    @media (max-width: 900px){
+      .sidebar{
+        transform:translateX(-100%);
+      }
+
+      .sidebar.mobile-open{
+        transform:translateX(0);
+      }
+
+      .content{
+        margin-left:0;
+        width:100%;
+      }
+
+      .hero-main h2{
+        font-size:32px;
+      }
+
+      .page-title{
+        font-size:22px;
+      }
+    }
+
+    @media (max-width: 560px){
+      .topbar,
+      .page{
+        padding-left:16px;
+        padding-right:16px;
+      }
+
+      .hero-main{
+        padding:24px;
+      }
+
+      .hero-main h2{
+        font-size:28px;
+      }
+
+      .detail-card h2{
+        font-size:28px;
+      }
+
+      .main-photo{
+        height:300px;
+      }
+
+      .thumbs{
+        grid-template-columns:repeat(3, 1fr);
+      }
+    }
+
+     .category-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+  gap:18px;
+  margin-bottom:22px;
+}
+
+.category-card{
+  background:linear-gradient(180deg, #121c31, #0e1629);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:22px;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+.category-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(17,199,111,.26);
+}
+
+.category-card.active{
+  background:linear-gradient(135deg, rgba(17,199,111,.18), rgba(41,182,246,.12));
+  border-color:rgba(17,199,111,.30);
+}
+
+.category-card-badge{
+  display:inline-block;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(41,182,246,.14);
+  color:#9fdfff;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:14px;
+}
+
+.category-card h4{
+  font-size:24px;
+  margin-bottom:10px;
+  color:#fff;
+}
+
+.category-card p{
+  color:var(--muted);
+  line-height:1.6;
+  font-size:14px;
+}
+
+.search-wrap{
+  margin-bottom:22px;
+}
+
+.search-input{
+  width:100%;
+  padding:16px 18px;
+  border-radius:18px;
+  border:1px solid var(--line);
+  background:#17233e;
+  color:white;
+  outline:none;
+  font-size:15px;
+  transition:.2s ease;
+}
+
+.search-input:focus{
+  border-color:rgba(17,199,111,.35);
+  box-shadow:0 0 0 3px rgba(17,199,111,.08);
+}
+
+.search-input::placeholder{
+  color:#93a3c7;
+}
+
+.cart-link{
+  position:relative;
+}
+
+.cart-count{
+  background:#ff5f5f;
+  color:white;
+  font-size:11px;
+  font-weight:700;
+  border-radius:999px;
+  padding:3px 7px;
+  margin-left:6px;
+}
+
+.checkout-steps {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 16px;
+  background: linear-gradient(90deg, #0f172a, #1e293b);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.step {
+  color: #94a3b8;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.step.active {
+  color: #22c55e;
+}
+
+.step.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background: #22c55e;
+  border-radius: 2px;
+}
+
+.checkout-steps {
+  display: none; 
+}
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside id="sidebar" class="sidebar closed">
+      <div class="brand">
+        <div class="brand-logo">H2</div>
+        <div class="brand-text">
+          <h1>H2Sports</h1>
+          <span>Loja de camisas e artigos esportivos</span>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a href="#" data-view="home" class="menu-link active">
+          <span class="icon">🏠</span>
+          <span>Página inicial</span>
+        </a>
+
+        <a href="#" data-view="payments" class="menu-link">
+          <span class="icon">💳</span>
+          <span>Forma de pagamento</span>
+        </a>
+
+        <a href="#" data-view="orders" class="menu-link">
+          <span class="icon">📦</span>
+          <span>Meus pedidos</span>
+        </a>
+
+        <a href="#" data-view="cart" class="menu-link cart-link">
+  <span class="icon">
+    🛒 <span id="cartCount" class="cart-count">0</span>
+  </span>
+  <span>Carrinho</span>
+</a>
+
+      </nav>
+
+      <div class="footer-note">
+        H2Sports © 2026<br>
+        CNPJ: 63.904.450/0001-29
+
+        Curitiba/PR
+      </div>
+    </aside>
+
+    <div id="overlay" class="overlay"></div>
+
+    <main id="content" class="content full">
+      <header class="topbar">
+        <div class="left-topbar">
+          <button id="hamburger" class="hamburger">☰</button>
+          <div id="pageTitle" class="page-title">Página inicial</div>
+        </div>
+        <div class="hero-chip">FRETE GRÁTIS PARA TODO BRASIL</div>
+      </header>
+
+     <div id="checkoutSteps" class="checkout-steps">
+  <div class="step active" data-step="1">🛒 Carrinho</div>
+  <div class="step" data-step="2">🚚 Entrega</div>
+  <div class="step" data-step="3">💳 Pagamento</div>
+  <div class="step" data-step="4">✅ Confirmação</div>
+</div>
+
+      <!-- HOME -->
+      <section id="page-home" class="page active">
+        
+
+        <div class="section-title" id="productsSection">
+  <h3>Produtos em destaque</h3>
+  <span>Escolha a categoria desejada</span>
+</div>
+
+<div class="category-cards">
+  <div class="category-card active" data-type="all" onclick="filterProducts('all', this)">
+    <div class="category-card-badge">Todos</div>
+    <h4>Todos os produtos</h4>
+    <p>Veja toda a coleção disponível da H2Sports.</p>
+  </div>
+
+  <div class="category-card" data-type="Jogador" onclick="filterProducts('Jogador', this)">
+    <div class="category-card-badge">Premium</div>
+    <h4>Modelo Jogador</h4>
+    <p>Peças com visual mais técnico, acabamento premium e pegada profissional.</p>
+  </div>
+
+  <div class="category-card" data-type="Torcedor Masculino" onclick="filterProducts('Torcedor Masculino', this)">
+    <div class="category-card-badge">Masculino</div>
+    <h4>Torcedor Masculino</h4>
+    <p>Modelos confortáveis para o dia a dia, torcida e uso casual.</p>
+  </div>
+
+  <div class="category-card" data-type="feminino" onclick="filterProducts('feminino', this)">
+    <div class="category-card-badge">Feminino</div>
+    <h4>Modelos Femininos</h4>
+    <p>Produtos com caimento pensado para o público feminino.</p>
+  </div>
+</div>
+
+    <div class="search-wrap">
+  <input
+    type="text"
+    id="productSearch"
+    class="search-input"
+    placeholder="Pesquisar nesta categoria..."
+    oninput="handleSearch()"
+  >
+</div>
+
+<div id="productsGrid" class="products-grid"></div>
+      </section>
+
+      <!-- PRODUCT -->
+      <section id="page-product" class="page">
+        <div id="productDetail"></div>
+      </section>
+
+      <!-- PAYMENTS -->
+      <section id="page-payments" class="page">
+        <div class="payment-wrap">
+          <div class="panel">
+            <h3>Formas de pagamento</h3>
+            <p>
+              A H2Sports aceita pagamento por <strong>Pix</strong> e <strong>cartão de crédito</strong>.
+              Ao escolher o método na página do produto, o pedido é salvo em “Meus pedidos”.
+            </p>
+          </div>
+
+          <div class="pay-cards">
+            <div class="pay-card">
+              <h4>Pix</h4>
+              <p>
+                Aprovação mais rápida e prática.<br><br>
+                Exemplo de chave Pix:<br>
+                <strong>h2sports@lojavirtual.com</strong>
+              </p>
+            </div>
+
+            <div class="pay-card">
+  <h4>Cartão de crédito</h4>
+  <p>Digite os dados do seu cartão:</p>
+
+  <div class="field">
+    <label for="cardNumber">Número do cartão</label>
+    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000">
+  </div>
+
+  <div class="field">
+    <label for="cardHolder">Nome no cartão</label>
+    <input type="text" id="cardHolder" placeholder="GABRIEL HENRIKE">
+  </div>
+
+  <div class="field" style="display:flex; gap:12px;">
+    <input type="text" id="cardMonth" placeholder="MM" style="flex:1">
+    <input type="text" id="cardYear" placeholder="AAAA" style="flex:1">
+    <input type="text" id="cardCvv" placeholder="CVV" style="flex:1">
+  </div>
+
+  <button class="btn btn-primary" onclick="criarPagamentoAsaas()">
+    Pagar com cartão
+  </button>
+</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ORDERS -->
+<section id="page-orders" class="page">
+  <div class="orders-wrap">
+    <div class="panel">
+      <h3>Meus pedidos</h3>
+      <p>...</p>
+    </div>
+
+    <div id="ordersList"></div>
+  </div>
+</section>
+
+<!-- CART (FORA DO ORDERS) -->
+<section id="page-cart" class="page">
+  <div class="orders-wrap">
+
+    <div class="panel">
+      <h3>Meu carrinho</h3>
+      <p>Produtos adicionados ao carrinho.</p>
+    </div>
+
+    <div id="cartList"></div>
+
+    <div id="cartTotalBox" style="margin-top:16px;"></div>
+
+  </div>
+</section>
+
+<section id="page-checkout" class="page">
+  <div id="checkoutContent"></div>
+</section>
+
+  <div id="toast" class="success-toast">Pedido salvo com sucesso!</div>
+
+  <script>
+    const BASE_URL = "<?= baseUrl ?>";
+    const INITIAL_VIEW = "<?= initialView ?>";
+    const PRODUCT_ID = "<?= productId ?>";
+
+    const PRODUCTS = [
+  {
+    id: "flamengo-2025-2",
+    type: "Jogador",
+    category: "Camisa Oficial",
+    title: "Camisa Flamengo II 2025",
+    price: 249.90,
+    shortDesc: "Modelo torcedor Masculino com tecido leve e excelente acabamento.",
+    description: "Camisa Flamengo branca Adidas...",
+    photos: [
+      "https://i.imgur.com/NFKBLXB.png",
+      "https://i.imgur.com/egaf8kQ.png"
+    ]
+  },
+
+  {
+    id: "brasil-2026-away",
+    type: "Jogador",
+    category: "Seleção",
+    title: "Camisa Copa do Mundo 2026 Modelo Jogador",
+    price: 229.90,
+    shortDesc: "Modelo clássico com visual moderno e tecido confortável.",
+    description: "Camisa da seleção...",
+    photos: [
+      "https://placehold.co/900x1100/0033aa/FFFFFF?text=Brasil+Azul+Frente"
+    ]
+  }
+];
+
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('content');
+    const overlay = document.getElementById('overlay');
+    const hamburger = document.getElementById('hamburger');
+    const pageTitle = document.getElementById('pageTitle');
+    const menuLinks = document.querySelectorAll('.menu-link');
+    let currentCategory = 'all';
+
+    function formatPrice(value){
+      return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function toggleSidebar(){
+      if(window.innerWidth <= 900){
+        sidebar.classList.toggle('mobile-open');
+        overlay.classList.toggle('show');
+      }else{
+        sidebar.classList.toggle('closed');
+        content.classList.toggle('full');
+      }
+    }
+
+    hamburger.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('show');
+    });
+
+    menuLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const view = link.dataset.view;
+        showPage(view);
+        if(window.innerWidth <= 900){
+          sidebar.classList.remove('mobile-open');
+          overlay.classList.remove('show');
+        }
+      });
+    });
+
+    function setActiveMenu(view){
+      menuLinks.forEach(link => {
+        link.classList.toggle('active', link.dataset.view === view);
+      });
+    }
+
+    function showPage(view, updateHistory = true){
+  const steps = document.getElementById('checkoutSteps');
+  if(steps){
+    steps.style.display = 'none';
+  }
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  const titles = {
+    home: 'Página inicial',
+    product: 'Detalhes do produto',
+    payments: 'Forma de pagamento',
+    orders: 'Meus pedidos',
+    checkout: 'Carrinho',
+    cart: 'Meu carrinho'
+  };
+
+  pageTitle.textContent = titles[view] || 'H2Sports';
+  setActiveMenu(view === 'product' ? '' : view);
+
+  
+  if(view === 'cart'){
+    renderCart();
+    return;
+  }
+
+  if(view === 'checkout'){
+    goToCheckout();
+    return;
+  }
+
+  if(view === 'orders'){
+    renderOrders();
+  }
+
+  const page = document.getElementById(`page-${view}`);
+  if(page){
+    page.classList.add('active');
+  }
+}
+
+    function scrollToProducts(){
+      const el = document.getElementById('productsSection');
+      if(el){
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    function renderProducts(type = 'all', searchTerm = ''){
+  const grid = document.getElementById('productsGrid');
+
+  let filteredProducts = type === 'all'
+    ? PRODUCTS
+    : PRODUCTS.filter(product => product.type === type);
+
+  const term = searchTerm.trim().toLowerCase();
+
+  if(term){
+    filteredProducts = filteredProducts.filter(product =>
+      product.title.toLowerCase().includes(term) ||
+      product.category.toLowerCase().includes(term) ||
+      product.shortDesc.toLowerCase().includes(term) ||
+      product.description.toLowerCase().includes(term)
+    );
+  }
+
+  if(!filteredProducts.length){
+    grid.innerHTML = `
+      <div class="empty-state">
+        Nenhum produto encontrado para esta busca.
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filteredProducts.map(product => `
+    <div class="product-card" onclick="openProduct('${product.id}')">
+      <div class="product-image">
+        <img src="${product.photos[0]}" alt="${product.title}">
+      </div>
+
+      <div class="product-body">
+        <span class="badge">${product.category}</span>
+        <div class="product-title">${product.title}</div>
+        <div class="product-desc">${product.shortDesc}</div>
+
+        <div class="product-footer">
+          <div class="price">${formatPrice(product.price)}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+   function filterProducts(type, card){
+  currentCategory = type;
+
+  const searchInput = document.getElementById('productSearch');
+  const searchTerm = searchInput ? searchInput.value : '';
+
+  renderProducts(type, searchTerm);
+
+  document.querySelectorAll('.category-card').forEach(item => {
+    item.classList.remove('active');
+  });
+
+  if(card){
+    card.classList.add('active');
+  }
+}
+
+function handleSearch(){
+  const searchInput = document.getElementById('productSearch');
+  const searchTerm = searchInput ? searchInput.value : '';
+
+  renderProducts(currentCategory, searchTerm);
+}
+
+    function openProduct(productId){
+  renderProductPage(productId);
+  showPage('product', false);
+
+  const url = BASE_URL
+    ? `${BASE_URL}?view=product&id=${productId}`
+    : `?view=product&id=${productId}`;
+
+  history.pushState(
+    { view: 'product', productId: productId },
+    '',
+    url
+  );
+}
+
+    function getProductUrl(productId){
+      if(BASE_URL){
+        return `${BASE_URL}?view=product&id=${productId}`;
+      }
+      return `?view=product&id=${productId}`;
+    }
+
+    function getProductById(id){
+      return PRODUCTS.find(p => p.id === id);
+    }
+
+    function renderProductPage(productId){
+      const product = getProductById(productId);
+      const container = document.getElementById('productDetail');
+
+      if(!product){
+        container.innerHTML = `
+          <div class="panel">
+            <h3>Produto não encontrado</h3>
+            <p>O produto solicitado não existe. Volte para a página inicial para escolher outro item.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+  <button class="btn btn-primary" style="margin-bottom:16px; display:flex; align-items:center; gap:8px;" onclick="goBack()">
+  ← Voltar
+</button>
+
+  <div class="product-detail">
+          <div class="gallery">
+            <div class="main-photo">
+              <img id="mainProductPhoto" src="${product.photos[0]}" alt="${product.title}">
+            </div>
+
+            <div class="thumbs">
+              ${product.photos.map((photo, index) => `
+                <div class="thumb ${index === 0 ? 'active' : ''}" onclick="changePhoto('${photo}', this)">
+                  <img src="${photo}" alt="Foto ${index + 1}">
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <span class="badge">${product.category}</span>
+            <h2>${product.title}</h2>
+            <div class="price">${formatPrice(product.price)}</div>
+            <p class="desc">${product.description}</p>
+
+            <div class="info-line">
+              <span>Disponibilidade</span>
+              <strong>Em estoque</strong>
+            </div>
+            <div class="info-line">
+              <span>Personalização</span>
+              <strong>Nome e número</strong>
+            </div>
+
+            <div class="form-section">
+              <div class="form-title">Escolha o tamanho</div>
+              <div class="sizes" id="sizes">
+                <button type="button" class="size-btn active" data-size="P">P</button>
+                <button type="button" class="size-btn" data-size="M">M</button>
+                <button type="button" class="size-btn" data-size="G">G</button>
+                <button type="button" class="size-btn" data-size="GG">GG</button>
+              </div>
+
+              <div class="field">
+                <label for="customName">Nome para personalização</label>
+                <input type="text" id="customName" placeholder="Ex.: GABRIEL">
+              </div>
+
+              <div class="field">
+                <label for="customNumber">Número</label>
+                <input type="number" id="customNumber" placeholder="Ex.: 10">
+              </div>
+
+              
+
+              <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+  <button class="btn btn-primary" onclick="buyNow('${product.id}')">
+  Comprar agora
+</button>
+
+<button class="btn btn-secondary" onclick="addToCart('${product.id}')">
+  Adicionar ao carrinho
+</button>
+</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      bindSizeButtons();
+    }
+
+    function changePhoto(src, element){
+      const main = document.getElementById('mainProductPhoto');
+      if(main){
+        main.src = src;
+      }
+
+      document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function bindSizeButtons(){
+      document.querySelectorAll('.size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    }
+
+    function getSelectedSize(){
+      const active = document.querySelector('.size-btn.active');
+      return active ? active.dataset.size : 'P';
+    }
+
+    
+
+    
+
+    function saveOrder(productId){
+      const product = getProductById(productId);
+      if(!product) return;
+
+      const customName = document.getElementById('customName')?.value.trim() || '';
+      const customNumber = document.getElementById('customNumber')?.value.trim() || '';
+      const size = getSelectedSize();
+    
+      const order = {
+        id: Date.now(),
+        productId: product.id,
+        title: product.title,
+        price: product.price,
+        size,
+        customName,
+        customNumber,
+        createdAt: new Date().toLocaleString('pt-BR')
+      };
+
+      const orders = JSON.parse(localStorage.getItem('h2sports_orders') || '[]');
+      orders.unshift(order);
+      localStorage.setItem('h2sports_orders', JSON.stringify(orders));
+
+      showToast('Pedido salvo com sucesso!');
+    }
+
+    function renderOrders(){
+      const list = document.getElementById('ordersList');
+      const orders = JSON.parse(localStorage.getItem('h2sports_orders') || '[]');
+
+      if(!orders.length){
+        list.innerHTML = `
+          <div class="empty-state">
+            Você ainda não possui pedidos salvos.
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = orders.map(order => `
+  <div class="order-item">
+    <div class="order-title">${order.title}</div>
+    <div><strong>${formatPrice(order.price)}</strong></div>
+    <div class="order-meta">
+      <strong>Tamanho:</strong> ${order.size}<br>
+      <strong>Nome:</strong> ${order.customName || '-'}<br>
+      <strong>Número:</strong> ${order.customNumber || '-'}<br>
+      <strong>Data:</strong> ${order.createdAt}
+    </div>
+
+    <button class="remove-order-btn" onclick="removeOrder(${order.id})">
+      Remover
+    </button>
+  </div>
+`).join('');
+    }
+
+    function renderCart(){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  const page = document.getElementById('page-cart');
+  if(page){
+    page.classList.add('active');
+  }
+
+  pageTitle.textContent = 'Meu carrinho';
+
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const list = document.getElementById('cartList');
+
+  if(!cart.length){
+  list.innerHTML = `<div class="empty-state">Carrinho vazio</div>`;
+
+  document.getElementById('cartTotalBox').innerHTML = `
+    <div class="panel">
+      <h3>Total: R$ 0,00</h3>
+
+      <button class="btn btn-primary" disabled style="opacity:0.5; cursor:not-allowed;">
+        Finalizar compra
+      </button>
+    </div>
+  `;
+
+  return;
+}
+
+  let total = 0;
+
+  list.innerHTML = cart.map(item => {
+    total += item.price;
+
+    return `
+      <div class="order-item">
+        <div class="order-title">${item.title}</div>
+        <div><strong>${formatPrice(item.price)}</strong></div>
+
+        <button class="remove-order-btn" onclick="removeFromCart(${item.id})">
+          Remover
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('cartTotalBox').innerHTML = `
+    <div class="panel">
+      <h3>Total: ${formatPrice(total)}</h3>
+
+      <button class="btn btn-primary" onclick="goToCheckout()">
+        Finalizar compra
+      </button>
+    </div>
+  `;
+}
+    function removeOrder(orderId){
+  const orders = JSON.parse(localStorage.getItem('h2sports_orders') || '[]');
+  const updatedOrders = orders.filter(order => order.id !== orderId);
+  localStorage.setItem('h2sports_orders', JSON.stringify(updatedOrders));
+  renderOrders();
+  showToast('Pedido removido com sucesso!');
+}
+
+function removeFromCart(itemId){
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const updatedCart = cart.filter(item => item.id !== itemId);
+  localStorage.setItem('h2sports_cart', JSON.stringify(updatedCart));
+  renderCart();
+  showToast('Produto removido do carrinho!');
+
+updateCartCount();
+
+}
+
+    function showToast(message){
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2200);
+    }
+
+    function addToCart(productId){
+  const product = getProductById(productId);
+  if(!product) return;
+
+  const customName = document.getElementById('customName')?.value.trim() || '';
+  const customNumber = document.getElementById('customNumber')?.value.trim() || '';
+  const size = getSelectedSize();
+
+  const cartItem = {
+    id: Date.now(),
+    productId: product.id,
+    title: product.title,
+    price: product.price,
+    size,
+    customName,
+    customNumber,
+    createdAt: new Date().toLocaleString('pt-BR')
+  };
+
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  cart.unshift(cartItem);
+
+  localStorage.setItem('h2sports_cart', JSON.stringify(cart));
+
+  showToast('Produto adicionado ao carrinho!');
+
+updateCartCount();
+
+}
+
+function buyNow(productId){
+  addToCart(productId);
+  goToCheckout()
+}
+
+function updateCartCount(){
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const count = cart.length;
+
+  const el = document.getElementById('cartCount');
+  if(el){
+    el.textContent = count;
+  }
+}
+
+function finalizarCompra(){
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+
+  if(!cart.length){
+    showToast('Carrinho vazio!');
+    return;
+  }
+
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  const chavePix = "SEUEMAIL@GMAIL.COM"; // 🔥 SUA CHAVE PIX
+
+  document.getElementById('cartList').innerHTML = `
+    <div class="panel">
+      <h3>Pagamento via Pix</h3>
+
+      <p><strong>Valor:</strong> ${formatPrice(total)}</p>
+
+      <p><strong>Chave Pix:</strong></p>
+      <p style="font-size:18px; word-break:break-all;">
+        ${chavePix}
+      </p>
+
+      <button class="btn btn-primary" onclick="copiarPix('${chavePix}')">
+        Copiar chave Pix
+      </button>
+
+      <p style="margin-top:12px;">
+        Após o pagamento, envie o comprovante para confirmação.
+      </p>
+    </div>
+  `;
+}
+
+    function copiarPix(){
+  const text = document.getElementById('pixCode').value;
+  navigator.clipboard.writeText(text);
+  showToast('Código Pix copiado!');
+}
+
+    async function pagarCartaoAPI(){
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+
+  if(!cart.length){
+    showToast('Carrinho vazio!');
+    return;
+  }
+
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  try {
+    const response = await fetch('http://localhost:3000/criar-cartao', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        valor: total
+      })
+    });
+
+    const data = await response.json();
+
+    // redireciona para pagamento
+    window.location.href = data.checkoutUrl;
+
+  } catch {
+    showToast('Erro ao gerar pagamento!');
+  }
+}
+
+    function init(){
+  renderProducts();
+
+  if(INITIAL_VIEW === 'product' && PRODUCT_ID){
+    renderProductPage(PRODUCT_ID);
+    showPage('product', false);
+
+  }else if(INITIAL_VIEW === 'payments'){
+    showPage('payments', false);
+
+  }else if(INITIAL_VIEW === 'orders'){
+    showPage('orders', false); 
+
+  }else if(INITIAL_VIEW === 'checkout'){
+    goToCheckout();
+
+  }else{
+    showPage('home', false);
+  }
+
+  updateCartCount();
+}
+
+    window.addEventListener('resize', () => {
+      if(window.innerWidth > 900){
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('show');
+        sidebar.classList.remove('closed');
+        content.classList.remove('full');
+      }else{
+        sidebar.classList.add('closed');
+        content.classList.add('full');
+      }
+    });
+
+window.addEventListener('popstate', () => {
+  const params = new URLSearchParams(window.location.search);
+  const view = params.get('view') || 'home';
+  const productId = params.get('id') || '';
+
+  if(view === 'product' && productId){
+  renderProductPage(productId);
+  showPage('product', false);
+} else if(view === 'payments'){
+  showPage('payments', false);
+} else if(view === 'orders'){
+  showPage('orders', false);
+} else if(view === 'cart'){
+  showPage('cart', false);
+} else {
+  showPage('home', false);
+}
+});
+
+    function goBack(){
+  showPage('home');
+}
+
+let checkoutStep = 1;
+
+function goToCheckout(){
+  checkoutStep = 1;
+  renderCheckout();
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-checkout').classList.add('active');
+
+  pageTitle.textContent = 'Carrinho';
+
+  const steps = document.getElementById('checkoutSteps');
+  if(steps){
+    steps.style.display = 'flex';
+  }
+
+  updateCheckoutSteps();
+}
+
+function renderCheckout(){
+  const container = document.getElementById('checkoutContent');
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  if(checkoutStep === 1){
+  container.innerHTML = `
+    <div style="display:flex; gap:20px; flex-wrap:wrap;">
+
+      <div class="panel" style="flex:2;">
+        <h3>Carrinho</h3>
+
+        ${cart.map(item => `
+          <div style="display:flex; justify-content:space-between; margin:12px 0;">
+            <span>${item.title}</span>
+            <strong>${formatPrice(item.price)}</strong>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="panel" style="flex:1;">
+        <h3>Total</h3>
+        <h2>${formatPrice(total)}</h2>
+
+        <div style="display:flex; gap:10px; margin-top:12px;">
+  <button class="btn btn-secondary" style="flex:1;" onclick="showPage('cart')">
+    ← Voltar
+  </button>
+
+  <button class="btn btn-primary" style="flex:1;" onclick="nextStep()">
+    Continuar
+  </button>
+</div>
+      </div>
+
+    </div>
+  `;
+}
+
+  if(checkoutStep === 2){
+  container.innerHTML = `
+    <div class="panel">
+      <h3>Entrega</h3>
+
+      <div style="display:grid; gap:16px;">
+
+        <!-- Nome + Telefone -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          
+          <div class="field">
+            <label>Nome completo</label>
+            <input id="nome" placeholder="Ex: Gabriel Henrique" style="height:50px;">
+          </div>
+
+          <div class="field">
+            <label>Telefone</label>
+            <input id="telefone" placeholder="(41) 99999-9999" style="height:50px;">
+          </div>
+
+        </div>
+
+        <!-- CEP -->
+        <div class="field">
+          <label>CEP</label>
+          <input id="cep" placeholder="00000-000" style="height:50px;" onblur="buscarCEP()">
+        </div>
+
+        <!-- Endereço -->
+        <div class="field">
+          <label>Endereço</label>
+          <input id="endereco" placeholder="Rua, Avenida..." style="height:50px;">
+        </div>
+
+        <!-- Bairro / Cidade / Estado -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+          
+          <div class="field">
+            <label>Bairro</label>
+            <input id="bairro" placeholder="Ex: Centro" style="height:50px;">
+          </div>
+
+          <div class="field">
+            <label>Cidade</label>
+            <input id="cidade" placeholder="Ex: Curitiba" style="height:50px;">
+          </div>
+
+          <div class="field">
+            <label>Estado</label>
+            <input id="estado" placeholder="Ex: PR" style="height:50px;">
+          </div>
+
+        </div>
+
+        <!-- Número / Complemento / Referência -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+          
+          <div class="field">
+            <label>Número</label>
+            <input id="numero" placeholder="123" style="height:50px;">
+          </div>
+
+          <div class="field">
+            <label>Complemento (opcional)</label>
+            <input id="complemento" placeholder="Apto, bloco..." style="height:50px;">
+          </div>
+
+          <div class="field">
+            <label>Ponto de referência (opcional)</label>
+            <input id="referencia" placeholder="Ex: perto do mercado" style="height:50px;">
+          </div>
+
+        </div>
+
+        <!-- Botões -->
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="btn btn-secondary" onclick="prevStep()">
+            ← Voltar
+          </button>
+
+          <button class="btn btn-primary" onclick="nextStep()">
+            Continuar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+  if(checkoutStep === 3){
+  container.innerHTML = `
+    <div class="panel">
+      <h3>Pagamento</h3>
+
+      <div class="payment-option" onclick="criarPagamentoAsaas()">
+  💸 Pagamento via Asaas (Pix + Cartão + Boleto)
+</div>
+
+      <div class="payment-option" onclick="criarPagamentoAsaas()">
+  💳 Cartão de crédito (Asaas)
+</div>
+
+      <div style="margin-top:16px;">
+        <button class="btn btn-secondary" onclick="prevStep()">
+          ← Voltar
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+  if(checkoutStep === 4){
+    container.innerHTML = `
+      <div class="panel">
+        <h3>Pedido confirmado ✅</h3>
+        <p>Seu pedido foi realizado com sucesso!</p>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+  <button class="btn btn-secondary" onclick="showPage('home')">
+    Voltar à loja
+  </button>
+
+  <button class="btn btn-primary" onclick="showPage('orders')">
+    Ver pedidos
+  </button>
+</div>
+    `;
+
+    localStorage.removeItem('h2sports_cart');
+    updateCartCount();
+  }
+}
+
+function updateCheckoutSteps(){
+  const steps = document.querySelectorAll('.step');
+
+  steps.forEach(step => {
+    const stepNumber = Number(step.dataset.step);
+
+    step.classList.remove('active');
+
+    if(stepNumber === checkoutStep){
+      step.classList.add('active');
+    }
+  });
+}
+
+function validarEntrega(){
+  const campos = [
+    { id: 'nome', nome: 'Nome completo' },
+    { id: 'telefone', nome: 'Telefone' },
+    { id: 'cep', nome: 'CEP' },
+    { id: 'endereco', nome: 'Endereço' },
+    { id: 'bairro', nome: 'Bairro' },
+    { id: 'cidade', nome: 'Cidade' },
+    { id: 'estado', nome: 'Estado' },
+    { id: 'numero', nome: 'Número' }
+  ];
+
+  for(let campo of campos){
+    const input = document.getElementById(campo.id);
+
+    if(!input || !input.value.trim()){
+      showToast(`Preencha o campo: ${campo.nome}`);
+      input.focus();
+
+      input.style.border = "1px solid #ff5f5f";
+input.style.boxShadow = "0 0 0 2px rgba(255,95,95,0.2)";
+
+      return false;
+    }else{
+      input.style.border = "";
+    }
+  }
+
+  return true;
+}
+
+function nextStep(){
+
+  if(checkoutStep === 2){
+    if(!validarEntrega()){
+      return;
+    }
+  }
+
+  checkoutStep++;
+  renderCheckout();
+  updateCheckoutSteps();
+}
+
+async function buscarCEP(){
+  const cepInput = document.getElementById('cep');
+  if(!cepInput) return;
+
+  let cep = cepInput.value.replace(/\D/g, '');
+
+  if(cep.length !== 8){
+    return;
+  }
+
+  try{
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await response.json();
+
+    if(data.erro){
+      showToast('CEP não encontrado!');
+      return;
+    }
+
+    document.getElementById('endereco').value = data.logradouro || '';
+    document.getElementById('bairro').value = data.bairro || '';
+    document.getElementById('cidade').value = data.localidade || '';
+    document.getElementById('estado').value = data.uf || '';
+
+  }catch(e){
+    showToast('Erro ao buscar CEP');
+  }
+}
+
+function prevStep(){
+  if(checkoutStep > 1){
+    checkoutStep--;
+    renderCheckout();
+    updateCheckoutSteps();
+  }
+}
+
+async function criarPagamentoAsaas() {
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+
+  if (!cart.length) {
+    showToast('Carrinho vazio!');
+    return;
+  }
+
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  const payload = {
+    customerId: "cus_000167623554",
+    value: total,
+    dueDate: new Date().toISOString().split('T')[0],
+    description: "Compra H2Sports",
+    orderId: Date.now().toString()
+  };
+
+  const BASE_URL = "https://script.google.com/macros/s/AKfycbw4T4koBy3SoJ94ShlIeZYrckIRYH4so2i_CKw2mZEHPRDqo6zgkK9S4Qo8uLEd2MybPA/exec";
+
+  try {
+    const formData = new URLSearchParams();
+formData.append("data", JSON.stringify(payload));
+
+const res = await fetch(BASE_URL, {
+  method: "POST",
+  body: formData
+});
+
+    const data = await res.json();
+
+    console.log("RESPOSTA GAS:", data);
+
+    if (data.success && data.url) {
+  window.open(data.url, "_blank");
+} else {
+      showToast("Erro no pagamento");
+      console.log("ERRO DETALHADO:", data);
+    }
+
+  } catch (err) {
+  console.log("ERRO DETALHADO:", err);
+  showToast("Erro ao conectar: " + err.message);
+}
+}
+    init();
+  </script>
+</body>
+</html>
