@@ -2016,7 +2016,29 @@ function prevStep(){
 }
 
 async function criarPagamentoAsaas() {
-  alert("Aqui vai integrar com Asaas depois");
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+
+  if (!cart.length) {
+    showToast('Carrinho vazio!');
+    return;
+  }
+
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  showToast("Criando pagamento...");
+
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  const fakeResponse = {
+    success: true,
+    url: "https://www.asaas.com/i/SEU_LINK"
+  };
+
+  if (fakeResponse.success) {
+    window.open(fakeResponse.url, "_blank");
+  } else {
+    showToast("Erro no pagamento");
+  }
 }
     
     init();
