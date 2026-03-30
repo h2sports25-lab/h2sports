@@ -2062,16 +2062,19 @@ async function criarPagamentoAsaas() {
     description: "Compra H2Sports",
     orderId: Date.now().toString()
   };
-
-  const BASE_URL = "https://script.google.com/macros/s/AKfycbw4T4koBy3SoJ94ShlIeZYrckIRYH4so2i_CKw2mZEHPRDqo6zgkK9S4Qo8uLEd2MybPA/exec";
-
+  
   try {
     const formData = new URLSearchParams();
 formData.append("data", JSON.stringify(payload));
 
-const res = await fetch(BASE_URL, {
+const res = await fetch("/api/pix", {
   method: "POST",
-  body: formData
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    value: total
+  })
 });
 
     const data = await res.json();
