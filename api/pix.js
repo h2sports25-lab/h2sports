@@ -1,4 +1,11 @@
-export default async function handler(req, res) {
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.post("/criar-pagamento", async (req, res) => {
   try {
     const { value } = req.body;
 
@@ -11,14 +18,14 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         billingType: "PIX",
         value: value,
-        dueDate: new Date().toISOString().split('T')[0],
+        dueDate: new Date().toISOString().split("T")[0],
         customer: "cus_000167623554"
       })
     });
 
     const data = await response.json();
 
-    return res.status(200).json({
+    res.json({
       success: true,
       pix: {
         qrCodeImage: data.pix.qrCodeImage,
@@ -28,9 +35,12 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: error.message
     });
   }
-}
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Servidor rodando"));
