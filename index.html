@@ -1106,9 +1106,9 @@
   <div id="toast" class="success-toast">Pedido salvo com sucesso!</div>
 
   <script>
-    const BASE_URL = "<?= baseUrl ?>";
-    const INITIAL_VIEW = "<?= initialView ?>";
-    const PRODUCT_ID = "<?= productId ?>";
+    const BASE_URL = "";
+const INITIAL_VIEW = "";
+const PRODUCT_ID = "";
 
     const PRODUCTS = [
   {
@@ -1664,39 +1664,9 @@ function finalizarCompra(){
   `;
 }
 
-    function copiarPix(){
-  const text = document.getElementById('pixCode').value;
+    function copiarPix(text){
   navigator.clipboard.writeText(text);
   showToast('Código Pix copiado!');
-}
-
-    async function pagarCartaoAPI(){
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
-
-  if(!cart.length){
-    showToast('Carrinho vazio!');
-    return;
-  }
-
-  let total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  try {
-    const response = await fetch('http://localhost:3000/criar-cartao', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        valor: total
-      })
-    });
-
-    const data = await response.json();
-
-    // redireciona para pagamento
-    window.location.href = data.checkoutUrl;
-
-  } catch {
-    showToast('Erro ao gerar pagamento!');
-  }
 }
 
     function init(){
