@@ -2016,53 +2016,9 @@ function prevStep(){
 }
 
 async function criarPagamentoAsaas() {
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
-
-  if (!cart.length) {
-    showToast('Carrinho vazio!');
-    return;
-  }
-
-  let total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  const payload = {
-    customerId: "cus_000167623554",
-    value: total,
-    dueDate: new Date().toISOString().split('T')[0],
-    description: "Compra H2Sports",
-    orderId: Date.now().toString()
-  };
-  
-  try {
-    const formData = new URLSearchParams();
-formData.append("data", JSON.stringify(payload));
-
-const res = await fetch("/api/pix", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    value: total
-  })
-});
-
-    const data = await res.json();
-
-    console.log("RESPOSTA GAS:", data);
-
-    if (data.success && data.url) {
-  window.open(data.url, "_blank");
-} else {
-      showToast("Erro no pagamento");
-      console.log("ERRO DETALHADO:", data);
-    }
-
-  } catch (err) {
-  console.log("ERRO DETALHADO:", err);
-  showToast("Erro ao conectar: " + err.message);
+  alert("Aqui vai integrar com Asaas depois");
 }
-}
+    
     init();
   </script>
 </body>
