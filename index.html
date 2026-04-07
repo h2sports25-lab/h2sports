@@ -1881,21 +1881,58 @@ function renderCheckout(){
     <div class="panel">
       <h3>Pagamento com cartão</h3>
 
-      <input id="cardNumber" placeholder="Número do cartão"><br><br>
-      <input id="cardHolder" placeholder="Nome no cartão"><br><br>
+      <div style="display:grid; gap:16px;">
 
-      <input id="cardExpirationMonth" placeholder="MM">
-      <input id="cardExpirationYear" placeholder="AAAA">
-      <input id="cardSecurityCode" placeholder="CVV"><br><br>
+        <div class="field">
+          <label>Número do cartão</label>
+          <input id="cardNumber" placeholder="0000 0000 0000 0000">
+        </div>
 
-      <input id="docNumber" placeholder="CPF"><br><br>
+        <div class="field">
+          <label>Nome no cartão</label>
+          <input id="cardHolder" placeholder="Nome igual ao cartão">
+        </div>
 
-      <button onclick="pagarComCartao()">Pagar agora</button>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+          
+          <div class="field">
+            <label>Mês</label>
+            <input id="cardExpirationMonth" placeholder="MM">
+          </div>
 
-      <br><br>
-      <button onclick="prevStep()">Voltar</button>
+          <div class="field">
+            <label>Ano</label>
+            <input id="cardExpirationYear" placeholder="AAAA">
+          </div>
+
+          <div class="field">
+            <label>CVV</label>
+            <input id="cardSecurityCode" placeholder="123">
+          </div>
+
+        </div>
+
+        <div class="field">
+          <label>CPF</label>
+          <input id="docNumber" placeholder="000.000.000-00">
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <button class="btn btn-secondary" onclick="prevStep()">
+            ← Voltar
+          </button>
+
+          <button class="btn btn-primary" onclick="pagarComCartao()">
+            Finalizar pagamento
+          </button>
+        </div>
+
+      </div>
     </div>
   `;
+
+  iniciarMercadoPago();
+}
 
   iniciarMercadoPago();
 }
