@@ -1881,11 +1881,11 @@ function renderCheckout(){
     <div class="panel">
       <h3>Pagamento</h3>
 
-      <div class="payment-option" onclick="criarPagamentoAsaas()">
+      <div class="payment-option" onclick="criarPagamentoMercadoPago()"
   💸 Pagamento via Asaas (Pix + Cartão + Boleto)
 </div>
 
-      <div class="payment-option" onclick="criarPagamentoAsaas()">
+      <div class="payment-option" onclick="criarPagamentoMercadoPago()"
   💳 Cartão de crédito (Asaas)
 </div>
 
@@ -2015,7 +2015,7 @@ function prevStep(){
   }
 }
 
-async function criarPagamentoAsaas() {
+async function criarPagamentoMercadoPago() {
   const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
 
   if (!cart.length) {
@@ -2023,24 +2023,23 @@ async function criarPagamentoAsaas() {
     return;
   }
 
-  let total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  showToast("Criando pagamento real...");
+  showToast("Redirecionando para pagamento...");
 
   try {
-    const response = await fetch("https://h2sports.onrender.com/criar-pagamento", {
+    const response = await fetch("https://h2sports.onrender.com/criar-pagamento-mp", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        valor: total
+        items: cart
       })
     });
 
     const data = await response.json();
 
-    if (data.success) {
-      window.open(data.url, "_blank");
+    if (data.url) {
+      window.location.href = data.url;
     } else {
       showToast("Erro ao gerar pagamento");
     }
