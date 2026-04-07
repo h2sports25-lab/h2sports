@@ -2089,11 +2089,20 @@ async function criarPagamentoMercadoPago() {
    let mp;
 
 function iniciarMercadoPago(){
+  if (typeof MercadoPago === "undefined") {
+    console.error("MercadoPago não carregou");
+    return;
+  }
+
   mp = new MercadoPago("APP_USR-184c16ac-296a-4d0b-a3ea-b0f30f461a68");
 }
 
     async function pagarComCartao(){
   try {
+
+    const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+    const total = cart.reduce((sum, item) => sum + item.price, 0);
+
     const token = await mp.createCardToken({
       cardNumber: document.getElementById("cardNumber").value,
       cardholderName: document.getElementById("cardHolder").value,
@@ -2111,7 +2120,7 @@ function iniciarMercadoPago(){
       },
       body: JSON.stringify({
         token: token.id,
-        transaction_amount: 100,
+        transaction_amount: total,
         description: "Compra H2Sports"
       })
     });
