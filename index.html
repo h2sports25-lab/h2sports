@@ -1676,6 +1676,7 @@ function finalizarCompra(){
 
   if(INITIAL_VIEW === 'product' && PRODUCT_ID){
     renderProductPage(PRODUCT_ID);
+   iniciarMercadoPago();
     showPage('product', false);
 
   }else if(INITIAL_VIEW === 'payments'){
@@ -2090,16 +2091,21 @@ async function criarPagamentoMercadoPago() {
 
    let mp;
 
-function iniciarMercadoPago(){
-  if (typeof MercadoPago === "undefined") {
-    console.error("MercadoPago não carregou");
-    return;
+
+    function iniciarMercadoPago(){
+  if (window.MercadoPago) {
+    mp = new MercadoPago("APP_USR-184c16ac-296a-4d0b-a3ea-b0f30f461a68");
+    console.log("MercadoPago iniciado");
+  } else {
+    console.error("SDK não carregou");
   }
+}
 
   mp = new MercadoPago("APP_USR-184c16ac-296a-4d0b-a3ea-b0f30f461a68");
 }
 
     async function pagarComCartao(){
+      console.log("CLICOU NO BOTÃO");
   try {
 
     const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
