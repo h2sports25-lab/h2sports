@@ -1063,7 +1063,6 @@
     <input type="text" id="cardCvv" placeholder="CVV" style="flex:1">
   </div>
 
-  <button class="btn btn-primary" onclick="criarPagamentoMercadoPago()">
     Pagar com cartão
   </button>
 </div>
@@ -1886,52 +1885,38 @@ function renderCheckout(){
 
       <div style="display:grid; gap:16px;">
 
-        <div class="field">
-          <label>Número do cartão</label>
-          <input id="cardNumber" placeholder="0000 0000 0000 0000">
-        </div>
+        <form id="form-checkout">
 
-        <div class="field">
-          <label>Nome no cartão</label>
-          <input id="cardHolder" placeholder="Nome igual ao cartão">
-        </div>
+  <div class="field">
+    <label>Número do cartão</label>
+    <input id="cardNumber" placeholder="0000 0000 0000 0000">
+  </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
-          
-          <div class="field">
-            <label>Mês</label>
-            <input id="cardExpirationMonth" placeholder="MM">
-          </div>
+  <div class="field">
+    <label>Validade</label>
+    <input id="expirationDate" placeholder="MM/YY">
+  </div>
 
-          <div class="field">
-            <label>Ano</label>
-            <input id="cardExpirationYear" placeholder="AAAA">
-          </div>
+  <div class="field">
+    <label>CVV</label>
+    <input id="securityCode" placeholder="123">
+  </div>
 
-          <div class="field">
-            <label>CVV</label>
-            <input id="cardSecurityCode" placeholder="123">
-          </div>
+  <div class="field">
+    <label>Nome no cartão</label>
+    <input id="cardholderName" placeholder="Nome igual ao cartão">
+  </div>
 
-        </div>
+  <div class="field">
+    <label>Email</label>
+    <input id="email" placeholder="seu@email.com">
+  </div>
 
-        <div class="field">
-          <label>CPF</label>
-          <input id="docNumber" placeholder="000.000.000-00">
-        </div>
+  <button class="btn btn-primary" type="submit">
+    Finalizar pagamento
+  </button>
 
-        <div style="display:flex; gap:10px; margin-top:10px;">
-          <button class="btn btn-secondary" onclick="prevStep()">
-            ← Voltar
-          </button>
-
-          <button class="btn btn-primary" onclick="pagarComCartao()">
-            Finalizar pagamento
-          </button>
-        </div>
-
-      </div>
-    </div>
+</form>
   `;
 
   iniciarMercadoPago();
@@ -2054,94 +2039,69 @@ function prevStep(){
   }
 }
 
-async function criarPagamentoMercadoPago() {
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
-
-  if (!cart.length) {
-    showToast('Carrinho vazio!');
-    return;
-  }
-
-  showToast("Redirecionando para pagamento...");
-
-  try {
-    const response = await fetch("https://h2sports.onrender.com/criar-pagamento-mp", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        items: cart
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      showToast("Erro ao gerar pagamento");
-    }
-
-  } catch (err) {
-    console.error(err);
-    showToast("Erro ao conectar com servidor");
-  }
-}
-
    let mp;
     
-function iniciarMercadoPago(){
-  if (window.MercadoPago) {
-    mp = new MercadoPago("APP_USR-184c16ac-296a-4d0b-a3ea-b0f30f461a68");
-    console.log("MercadoPago iniciado");
-  } else {
-    console.error("SDK não carregou");
-  }
-}
+let mp;
 
-    async function pagarComCartao(){
-      console.log("CLICOU NO BOTÃO");
-  try {
+function iniciarMercadoPago() {
 
-    const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
-    const total = cart.reduce((sum, item) => sum + item.price, 0);
+  mp = new MercadoPago("");
 
-    const token = await mp.createCardToken({
-      cardNumber: document.getElementById("cardNumber").value,
-      cardholderName: document.getElementById("cardHolder").value,
-      cardExpirationMonth: document.getElementById("cardExpirationMonth").value,
-      cardExpirationYear: document.getElementById("cardExpirationYear").value,
-      securityCode: document.getElementById("cardSecurityCode").value,
-      identificationType: "CPF",
-      identificationNumber: document.getElementById("docNumber").value
-    });
+  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
 
-    const response = await fetch("https://h2sports.onrender.com/pagar-cartao", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        token: token.id,
-        transaction_amount: total,
-        description: "Compra H2Sports"
-      })
-    });
+  const cardForm = mp.cardForm({
+    amount: total.toFixed(2),
 
-    const data = await response.json();
+    form: {
+      id: "form-checkout",
+      cardNumber: { id: "cardNumber" },
+      expirationDate: { id: "expirationDate" },
+      securityCode: { id: "securityCode" },
+      cardholderName: { id: "cardholderName" },
+      cardholderEmail: { id: "email" }
+    },
 
-    if(data.status === "approved"){
-      alert("Pagamento aprovado!");
-      nextStep();
-    } else {
-      alert("Pagamento recusado");
+    callbacks: {
+      onSubmit: async (event) => {
+        event.preventDefault();
+
+        const data = cardForm.getCardFormData();
+
+        try {
+
+          const response = await fetch(""https://h2sports.onrender.com/pagar"", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              token: data.token,
+              transaction_amount: Number(data.amount),
+              installments: 1,
+              payment_method_id: data.paymentMethodId,
+              payer: {
+                email: data.cardholderEmail
+              }
+            })
+          });
+
+          const result = await response.json();
+
+          if (result.status === "approved") {
+            alert("Pagamento aprovado!");
+            nextStep();
+          } else {
+            alert("Pagamento recusado");
+          }
+
+        } catch (err) {
+          console.error(err);
+          alert("Erro ao processar pagamento");
+        }
+      }
     }
-
-  } catch (err) {
-    console.error(err);
-    alert("Erro no pagamento");
-  }
+  });
 }
   init();
 </script>
