@@ -1819,6 +1819,7 @@ function renderCheckout(){
 }
 
   if(checkoutStep === 3){
+    console.log("ENTROU NO STEP 3");
   container.innerHTML = `
     <div class="panel">
       <h3>Pagamento</h3>
@@ -1831,9 +1832,9 @@ function renderCheckout(){
     </div>
   `;
 
- requestAnimationFrame(() => {
+ setTimeout(() => {
   initMercadoPagoBrick();
-});
+}, 300);
 }
 
   if (checkoutStep === 4) {
