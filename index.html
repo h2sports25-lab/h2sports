@@ -1611,11 +1611,6 @@ function finalizarCompra(){
   `;
 }
 
-    function copiarPix(text){
-  navigator.clipboard.writeText(text);
-  showToast('Código Pix copiado!');
-}
-
     function init(){
   renderProducts();
 
@@ -1836,9 +1831,9 @@ function renderCheckout(){
     </div>
   `;
 
-  setTimeout(() => {
-    initMercadoPagoBrick();
-  }, 100);
+ requestAnimationFrame(() => {
+  initMercadoPagoBrick();
+});
 }
 
   if (checkoutStep === 4) {
@@ -1962,6 +1957,17 @@ function prevStep(){
 }
 
     function initMercadoPagoBrick() {
+  if (!window.MercadoPago) {
+    console.error("MercadoPago SDK não carregou");
+    return;
+  }
+
+  const container = document.getElementById("paymentBrick_container");
+  if (!container) {
+    console.error("Container do pagamento não existe");
+    return;
+  }
+
   const mp = new MercadoPago("TEST-5416772088524473-040710-d91390438abd267445a0560dab9f2739-3320971428", {
     locale: "pt-BR"
   });
@@ -1983,9 +1989,7 @@ function prevStep(){
       onSubmit: async (formData) => {
         const response = await fetch("https://obituary-snowstorm-scabbed.ngrok-free.dev/processar-pagamento", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData)
         });
 
@@ -1998,7 +2002,6 @@ function prevStep(){
 
         return result;
       },
-
       onError: (error) => {
         console.log("Erro pagamento:", error);
       }
