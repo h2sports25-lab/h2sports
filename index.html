@@ -921,12 +921,6 @@
           <span class="icon">🏠</span>
           <span>Página inicial</span>
         </a>
-
-        <a href="#" data-view="payments" class="menu-link">
-          <span class="icon">💳</span>
-          <span>Forma de pagamento</span>
-        </a>
-
         <a href="#" data-view="orders" class="menu-link">
           <span class="icon">📦</span>
           <span>Meus pedidos</span>
@@ -1022,54 +1016,6 @@
         <div id="productDetail"></div>
       </section>
 
-      <!-- PAYMENTS -->
-      <section id="page-payments" class="page">
-        <div class="payment-wrap">
-          <div class="panel">
-            <h3>Formas de pagamento</h3>
-            <p>
-              A H2Sports aceita pagamento por <strong>Pix</strong> e <strong>cartão de crédito</strong>.
-              Ao escolher o método na página do produto, o pedido é salvo em “Meus pedidos”.
-            </p>
-          </div>
-
-          <div class="pay-cards">
-            <div class="pay-card">
-              <h4>Pix</h4>
-              <p>
-                Aprovação mais rápida e prática.<br><br>
-                Exemplo de chave Pix:<br>
-                <strong>h2sports@lojavirtual.com</strong>
-              </p>
-            </div>
-
-            <div class="pay-card">
-  <h4>Cartão de crédito</h4>
-  <p>Digite os dados do seu cartão:</p>
-
-  <div class="field">
-    <label for="cardNumber">Número do cartão</label>
-    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000">
-  </div>
-
-  <div class="field">
-    <label for="cardHolder">Nome no cartão</label>
-    <input type="text" id="cardHolder" placeholder="GABRIEL HENRIKE">
-  </div>
-
-  <div class="field" style="display:flex; gap:12px;">
-    <input type="text" id="cardMonth" placeholder="MM" style="flex:1">
-    <input type="text" id="cardYear" placeholder="AAAA" style="flex:1">
-    <input type="text" id="cardCvv" placeholder="CVV" style="flex:1">
-  </div>
-
-    Pagar com cartão
-  </button>
-</div>
-          </div>
-        </div>
-      </section>
-
       <!-- ORDERS -->
 <section id="page-orders" class="page">
   <div class="orders-wrap">
@@ -1104,8 +1050,7 @@
 
   <div id="toast" class="success-toast">Pedido salvo com sucesso!</div>
 
-<script src="https://sdk.mercadopago.com/js/v2"></script>
-      
+   
   <script>
     const BASE_URL = "";
 const INITIAL_VIEW = "";
@@ -1675,7 +1620,6 @@ function finalizarCompra(){
 
   if(INITIAL_VIEW === 'product' && PRODUCT_ID){
     renderProductPage(PRODUCT_ID);
-   iniciarMercadoPago();
     showPage('product', false);
 
   }else if(INITIAL_VIEW === 'payments'){
@@ -1878,50 +1822,6 @@ function renderCheckout(){
   `;
 }
 
-  if(checkoutStep === 3){
-  container.innerHTML = `
-    <div class="panel">
-      <h3>Pagamento com cartão</h3>
-
-      <div style="display:grid; gap:16px;">
-
-        <form id="form-checkout">
-
-  <div class="field">
-    <label>Número do cartão</label>
-    <input id="cardNumber" placeholder="0000 0000 0000 0000">
-  </div>
-
-  <div class="field">
-    <label>Validade</label>
-    <input id="expirationDate" placeholder="MM/YY">
-  </div>
-
-  <div class="field">
-    <label>CVV</label>
-    <input id="securityCode" placeholder="123">
-  </div>
-
-  <div class="field">
-    <label>Nome no cartão</label>
-    <input id="cardholderName" placeholder="Nome igual ao cartão">
-  </div>
-
-  <div class="field">
-    <label>Email</label>
-    <input id="email" placeholder="seu@email.com">
-  </div>
-
-  <button class="btn btn-primary" type="submit">
-    Finalizar pagamento
-  </button>
-
-</form>
-  `;
-
-  iniciarMercadoPago();
-}
-
   if(checkoutStep === 4){
     container.innerHTML = `
       <div class="panel">
@@ -2038,69 +1938,7 @@ function prevStep(){
     updateCheckoutSteps();
   }
 }
-    
-let mp;
 
-function iniciarMercadoPago() {
-
-  mp = new MercadoPago("TESTUSER6048731198607861044");
-
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
-  let total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  const cardForm = mp.cardForm({
-    amount: total.toFixed(2),
-
-    form: {
-      id: "form-checkout",
-      cardNumber: { id: "cardNumber" },
-      expirationDate: { id: "expirationDate" },
-      securityCode: { id: "securityCode" },
-      cardholderName: { id: "cardholderName" },
-      cardholderEmail: { id: "email" }
-    },
-
-    callbacks: {
-      onSubmit: async (event) => {
-        event.preventDefault();
-
-        const data = cardForm.getCardFormData();
-
-        try {
-
-          const response = await fetch("https://h2sports.onrender.com/pagar", { 
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              token: data.token,
-              transaction_amount: Number(data.amount),
-              installments: 1,
-              payment_method_id: data.paymentMethodId,
-              payer: {
-                email: data.cardholderEmail
-              }
-            })
-          });
-
-          const result = await response.json();
-
-          if (result.status === "approved") {
-            alert("Pagamento aprovado!");
-            nextStep();
-          } else {
-            alert("Pagamento recusado");
-          }
-
-        } catch (err) {
-          console.error(err);
-          alert("Erro ao processar pagamento");
-        }
-      }
-    }
-  });
-}
   init();
 </script>
 </body>
