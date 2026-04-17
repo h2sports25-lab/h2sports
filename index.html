@@ -1969,7 +1969,7 @@ function prevStep(){
     return;
   }
 
-  const mp = new MercadoPago("TEST-5416772088524473-040710-d91390438abd267445a0560dab9f2739-3320971428", {
+  const mp = new MercadoPago("TEST-6a0400b1-2928-41fc-be4d-92ea69eecd7b", {
     locale: "pt-BR"
   });
 
@@ -1988,21 +1988,43 @@ function prevStep(){
     },
     callbacks: {
       onSubmit: async (formData) => {
-        const response = await fetch("https://obituary-snowstorm-scabbed.ngrok-free.dev/processar-pagamento", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData)
-        });
+  try {
+    const paymentData = {
+      token: formData.token,
+      transaction_amount: Number(calcularTotalCarrinho()),
+      installments: Number(formData.installments),
+      payment_method_id: formData.payment_method_id,
+      payer: {
+        email: formData.payer.email
+      }
+    };
 
-        const result = await response.json();
-
-        if (result.success) {
-          checkoutStep = 4;
-          renderCheckout();
-        }
-
-        return result;
+    const response = await fetch("https://obituary-snowstorm-scabbed.ngrok-free.dev/process_payment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
       },
+      body: JSON.stringify(paymentData)
+    });
+
+    const result = await response.json();
+
+    console.log("RESPOSTA:", result);
+
+    if (result.status === "approved") {
+      checkoutStep = 4;
+      renderCheckout();
+    } else {
+      alert("Pagamento não aprovado: " + result.status);
+    }
+
+    return result;
+
+  } catch (error) {
+    console.error(error);
+    alert("Erro ao processar pagamento");
+  }
+}
       onError: (error) => {
         console.log("Erro pagamento:", error);
       }
