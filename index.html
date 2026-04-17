@@ -1987,6 +1987,11 @@ function prevStep(){
       }
     },
     callbacks: {
+
+  onReady: () => {
+    console.log("Brick carregado!");
+  },
+
   onSubmit: async (formData) => {
     try {
       const paymentData = {
@@ -2029,6 +2034,7 @@ function prevStep(){
   onError: (error) => {
     console.log("Erro pagamento:", error);
   }
+
 }
   });
 }
