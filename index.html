@@ -1959,125 +1959,105 @@ function prevStep(){
   }
 }
 
-    function initMercadoPagoBrick() {
+    async function initMercadoPagoBrick() {
+
   if (!window.MercadoPago) {
-    console.error("MercadoPago SDK não carregou");
+    console.error("SDK Mercado Pago não carregou");
     return;
   }
 
   const container = document.getElementById("paymentBrick_container");
+
   if (!container) {
-    console.error("Container do pagamento não existe");
+    console.error("Container não encontrado");
     return;
   }
 
-  const mp = new MercadoPago("APP_USR-5416772088524473-040710-fdf9a2f743ee593241b29c44f101725c-3320971428", {
-    locale: "pt-BR"
-  });
+  container.innerHTML = "";
+
+  const mp = new MercadoPago(
+    "APP_USR-c15801e8-0d03-432b-8250-87e75f818b02",
+    {
+      locale: "pt-BR"
+    }
+  );
 
   const bricksBuilder = mp.bricks();
 
-  bricksBuilder.create("payment", "paymentBrick_container", {
-  initialization: {
-    amount: calcularTotalCarrinho()
-  },
+  const settings = {
+    initialization: {
+      amount: calcularTotalCarrinho()
+    },
 
-  customization: {
-    paymentMethods: {
-      creditCard: "all",
-      debitCard: "all",
-      ticket: "all",
-      bankTransfer: "all"
-    }
-  },
-
-  callbacks: {
-
-  onReady: () => {
-    console.log("Brick carregado!");
-  },
-
-  onSubmit: async (formData) => {
-
-    console.log("FORM DATA:", formData);
-
-    try {
-
-      const data = formData.formData || formData;
-
-      const paymentData = {
-
-        token: data.token,
-
-        transaction_amount: Number(calcularTotalCarrinho()),
-
-        installments: Number(data.installments || 1),
-
-        payment_method_id: data.payment_method_id,
-
-        issuer_id: data.issuer_id,
-
-        payer: {
-          email: data.payer?.email,
-
-          identification: {
-            type: data.payer?.identification?.type || "CPF",
-
-            number: data.payer?.identification?.number
-          }
-        }
-      };
-
-      console.log("ENVIANDO:", paymentData);
-
-      const response = await fetch(
-        "https://obituary-snowstorm-scabbed.ngrok-free.dev/process_payment",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify(paymentData)
-        }
-      );
-
-      const result = await response.json();
-
-      console.log("RESPOSTA BACKEND:", result);
-
-      if(result.status === "approved"){
-
-        checkoutStep = 4;
-
-        updateCheckoutSteps();
-
-        renderCheckout();
-
-      } else if(result.status === "pending"){
-
-        alert("Pagamento pendente.");
-
-      } else {
-
-        alert("Pagamento recusado.");
+    customization: {
+      paymentMethods: {
+        creditCard: "all",
+        debitCard: "all",
+        ticket: "all",
+        bankTransfer: "all"
       }
+    },
 
-    } catch(error){
+    callbacks: {
 
-      console.log("Erro no pagamento:", error);
+      onReady: () => {
+        console.log("Brick carregado");
+      },
 
-      alert("Erro ao processar pagamento.");
+      onSubmit: async ({ formData }) => {
+
+        try {
+
+          const response = await fetch(
+            "https://https://obituary-snowstorm-scabbed.ngrok-free.dev/process_payment",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(formData)
+            }
+          );
+
+          const result = await response.json();
+
+          console.log(result);
+
+          if (result.status === "approved") {
+
+            checkoutStep = 4;
+
+            renderCheckout();
+
+            localStorage.removeItem("h2sports_cart");
+
+            updateCartCount();
+
+          } else {
+
+            alert("Pagamento não aprovado");
+          }
+
+        } catch (error) {
+
+          console.error(error);
+
+          alert("Erro ao processar pagamento");
+        }
+      },
+
+      onError: (error) => {
+        console.error(error);
+      }
     }
-  },
+  };
 
-  onError: (error) => {
-    console.log("Erro pagamento:", error);
-  }
+  await bricksBuilder.create(
+    "payment",
+    "paymentBrick_container",
+    settings
+  );
 }
-});
-  }
 
     function calcularTotalCarrinho() {
   const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
