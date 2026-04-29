@@ -1981,9 +1981,11 @@ function prevStep(){
     },
     customization: {
       paymentMethods: {
-        creditCard: "all",
-        debitCard: "all",
-        pix: "all"
+  creditCard: "all",
+  debitCard: "all",
+  ticket: "all",
+  bankTransfer: "all"
+}
       }
     },
     callbacks: {
@@ -2044,22 +2046,19 @@ function prevStep(){
 
     if (result.status === "approved") {
 
-      checkoutStep = 4;
-      renderCheckout();
+      if(result.status === "approved"){
 
-    } else {
+  checkoutStep = 4;
+  renderCheckout();
 
-      alert("Pagamento não aprovado: " + JSON.stringify(result));
-    }
+}else if(result.status === "pending"){
 
-    return result;
+  alert("Pagamento pendente.");
 
-  } catch (error) {
+}else{
 
-    console.error("ERRO FRONT:", error);
-
-    alert("Erro ao processar pagamento");
-  }
+  alert("Pagamento recusado.");
+}
 },
 
   onError: (error) => {
