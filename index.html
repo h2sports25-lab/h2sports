@@ -1975,7 +1975,7 @@ function prevStep(){
 
   const bricksBuilder = mp.bricks();
 
-  bricksBuilder.create("payment", "paymentBrick_container", {
+  bricksBuilder.create("payment", "paymentBrick_container"), {
     initialization: {
       amount: calcularTotalCarrinho()
     },
