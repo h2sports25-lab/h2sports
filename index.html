@@ -1994,32 +1994,36 @@ function prevStep(){
 
  onSubmit: async (formData) => {
 
-  console.log("FORM DATA:", JSON.stringify(formData, null, 2));
+  console.log("FORM DATA:", formData);
 
   try {
 
+    // pega os dados corretamente
+    const data = formData.formData || formData;
+
     const paymentData = {
-  token: formData.formData.token,
 
-  transaction_amount: Number(calcularTotalCarrinho()),
+      token: data.token,
 
-  installments: Number(formData.formData.installments || 1),
+      transaction_amount: Number(calcularTotalCarrinho()),
 
-  payment_method_id: formData.formData.payment_method_id,
+      installments: Number(data.installments || 1),
 
-  issuer_id: formData.formData.issuer_id,
+      payment_method_id: data.payment_method_id,
 
-  payer: {
-    email:
-      formData.formData.payer?.email ||
-      "test_user_123456@testuser.com",
+      issuer_id: data.issuer_id,
 
-    identification: {
-      type: formData.formData.payer?.identification?.type,
-      number: formData.formData.payer?.identification?.number
-    }
-  }
-};
+      payer: {
+        email:
+          data.payer?.email ||
+          "test_user_123456@testuser.com",
+
+        identification: {
+          type: data.payer?.identification?.type,
+          number: data.payer?.identification?.number
+        }
+      }
+    };
 
     console.log("ENVIANDO:", paymentData);
 
