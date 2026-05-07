@@ -916,6 +916,24 @@
         </div>
       </div>
 
+<div
+  id="adminPanel"
+  style="
+    display:none;
+    margin-bottom:20px;
+    padding:14px;
+    border-radius:16px;
+    background:#16203a;
+    border:1px solid rgba(17,199,111,.2);
+  "
+>
+  <strong>PAINEL ADMIN</strong>
+
+  <div style="margin-top:10px;">
+    Você está logado como administrador.
+  </div>
+</div>
+      
       <nav class="menu">
         <a href="#" data-view="home" class="menu-link active">
           <span class="icon">🏠</span>
@@ -953,7 +971,30 @@
           <button id="hamburger" class="hamburger">☰</button>
           <div id="pageTitle" class="page-title">Página inicial</div>
         </div>
-        <div class="hero-chip">FRETE GRÁTIS PARA TODO BRASIL</div>
+        <div style="display:flex; gap:10px; align-items:center;">
+
+  <div class="hero-chip">
+    FRETE GRÁTIS PARA TODO BRASIL
+  </div>
+
+  <button
+    id="loginBtn"
+    class="btn btn-primary"
+    onclick="loginGoogle()"
+  >
+    Entrar
+  </button>
+
+  <button
+    id="logoutBtn"
+    class="btn btn-secondary"
+    onclick="logout()"
+    style="display:none;"
+  >
+    Sair
+  </button>
+
+</div>
       </header>
 
      <div id="checkoutSteps" class="checkout-steps">
@@ -1051,6 +1092,102 @@
   <div id="toast" class="success-toast">Pedido salvo com sucesso!</div>
 
       <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+      <script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCvS0p2HhNUSBeCTeme-CspG9K90L-NASg",
+  authDomain: "h2sports-d2dd7.firebaseapp.com",
+  projectId: "h2sports-d2dd7",
+  storageBucket: "h2sports-d2dd7.firebasestorage.app",
+  messagingSenderId: "87756815685",
+  appId: "1:87756815685:web:0a10b2f2b5dd2f2ead522c",
+  measurementId: "G-QXX9E38NEX"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+
+const ADMIN_EMAIL = "h2sports25@gmail.com";
+
+window.loginGoogle = async function(){
+
+  try{
+
+    await signInWithPopup(auth, provider);
+
+  }catch(e){
+
+    console.error(e);
+
+    alert("Erro ao fazer login");
+
+  }
+
+}
+
+window.logout = async function(){
+
+  await signOut(auth);
+
+}
+
+onAuthStateChanged(auth, (user) => {
+
+  const loginBtn = document.getElementById("loginBtn");
+
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const adminPanel = document.getElementById("adminPanel");
+
+  if(user){
+
+    console.log("Usuário logado:", user.email);
+
+    loginBtn.style.display = "none";
+
+    logoutBtn.style.display = "block";
+
+    if(user.email === ADMIN_EMAIL){
+
+      adminPanel.style.display = "block";
+
+      console.log("ADMIN LOGADO");
+
+    }else{
+
+      adminPanel.style.display = "none";
+
+    }
+
+  }else{
+
+    loginBtn.style.display = "block";
+
+    logoutBtn.style.display = "none";
+
+    adminPanel.style.display = "none";
+
+  }
+
+});
+
+</script>
    
   <script>
     const BASE_URL = "";
