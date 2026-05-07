@@ -1131,7 +1131,7 @@ const provider = new GoogleAuthProvider();
 
 const ADMIN_EMAIL = "h2sports25@gmail.com";
 
-        let currentUserEmail = "";
+        window.currentUserEmail = "";
 
 window.loginGoogle = async function(){
 
@@ -1153,7 +1153,7 @@ window.logout = async function(){
 
   await signOut(auth);
 
-  currentUserEmail = "";
+  window.currentUserEmail = "";
 
   updateCartCount();
 
@@ -1173,7 +1173,7 @@ onAuthStateChanged(auth, (user) => {
 
     console.log("Usuário logado:", user.email);
 
-    currentUserEmail = user.email;
+    window.currentUserEmail = user.email;
 
     loginBtn.style.display = "none";
 
@@ -1193,7 +1193,7 @@ onAuthStateChanged(auth, (user) => {
 
   }else{
 
-    currentUserEmail = "";
+   window.currentUserEmail = "";
 
     loginBtn.style.display = "block";
 
@@ -1694,8 +1694,8 @@ updateCartCount();
 
     function getCartKey(){
 
-  if(currentUserEmail){
-    return `h2sports_cart_${currentUserEmail}`;
+  if(window.currentUserEmail){
+    return `h2sports_cart_${window.currentUserEmail}`;
   }
 
   return 'h2sports_cart_guest';
@@ -1703,8 +1703,8 @@ updateCartCount();
 
     function getOrdersKey(){
 
-  if(currentUserEmail){
-    return `h2sports_orders_${currentUserEmail}`;
+  if(window.currentUserEmail){
+    return `h2sports_orders_${window.currentUserEmail}`;
   }
 
   return 'h2sports_orders_guest';
