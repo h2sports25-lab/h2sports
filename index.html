@@ -1149,6 +1149,18 @@ window.loginGoogle = async function(){
 
 window.logout = async function(){
 
+  localStorage.removeItem("h2sports_cart");
+
+  localStorage.removeItem("h2sports_orders");
+
+  updateCartCount();
+
+  await signOut(auth);
+
+  showPage('home');
+
+}
+
   await signOut(auth);
 
 }
