@@ -900,6 +900,10 @@
   border-radius: 2px;
 }
 
+    .admin-hidden{
+  display:none !important;
+}
+
 .checkout-steps {
   display: none; 
 }
@@ -929,9 +933,8 @@
 <a
   href="#"
   data-view="admin"
-  class="menu-link"
+  class="menu-link admin-hidden"
   id="adminMenu"
-  style="display:none;"
 >
   <span class="icon">🛠️</span>
   <span>Painel Admin</span>
@@ -1173,13 +1176,13 @@ onAuthStateChanged(auth, (user) => {
 
     if(user.email === ADMIN_EMAIL){
 
-      adminMenu.style.display = "flex";
+      adminMenu.classList.remove("admin-hidden");
 
       console.log("ADMIN LOGADO");
 
     }else{
 
-      adminMenu.style.display = "none";
+     adminMenu.classList.add("admin-hidden");
 
     }
 
@@ -1189,7 +1192,7 @@ onAuthStateChanged(auth, (user) => {
 
     logoutBtn.style.display = "none";
 
-    adminMenu.style.display = "none";
+    adminMenu.classList.add("admin-hidden");
 
   }
 
