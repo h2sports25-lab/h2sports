@@ -916,23 +916,7 @@
         </div>
       </div>
 
-<div
-  id="adminPanel"
-  style="
-    display:none;
-    margin-bottom:20px;
-    padding:14px;
-    border-radius:16px;
-    background:#16203a;
-    border:1px solid rgba(17,199,111,.2);
-  "
->
-  <strong>PAINEL ADMIN</strong>
 
-  <div style="margin-top:10px;">
-    Você está logado como administrador.
-  </div>
-</div>
       
       <nav class="menu">
         <a href="#" data-view="home" class="menu-link active">
@@ -940,6 +924,18 @@
           <span>Página inicial</span>
         </a>
         <a href="#" data-view="orders" class="menu-link">
+
+<a
+  href="#"
+  data-view="admin"
+  class="menu-link"
+  id="adminMenu"
+  style="display:none;"
+>
+  <span class="icon">🛠️</span>
+  <span>Painel Admin</span>
+</a>
+          
           <span class="icon">📦</span>
           <span>Meus pedidos</span>
         </a>
@@ -1089,6 +1085,17 @@
   <div id="checkoutContent"></div>
 </section>
 
+      <section id="page-admin" class="page">
+
+  <div class="panel">
+    <h3>Painel Administrativo</h3>
+    <p>Pedidos realizados pelos clientes.</p>
+  </div>
+
+  <div id="adminOrdersList"></div>
+
+</section>
+
   <div id="toast" class="success-toast">Pedido salvo com sucesso!</div>
 
       <script src="https://sdk.mercadopago.com/js/v2"></script>
@@ -1153,7 +1160,7 @@ onAuthStateChanged(auth, (user) => {
 
   const logoutBtn = document.getElementById("logoutBtn");
 
-  const adminPanel = document.getElementById("adminPanel");
+  const adminMenu = document.getElementById("adminMenu");
 
   if(user){
 
@@ -1165,13 +1172,13 @@ onAuthStateChanged(auth, (user) => {
 
     if(user.email === ADMIN_EMAIL){
 
-      adminPanel.style.display = "block";
+      adminMenu.style.display = "flex";
 
       console.log("ADMIN LOGADO");
 
     }else{
 
-      adminPanel.style.display = "none";
+      adminMenu.style.display = "none";
 
     }
 
@@ -1181,7 +1188,7 @@ onAuthStateChanged(auth, (user) => {
 
     logoutBtn.style.display = "none";
 
-    adminPanel.style.display = "none";
+    adminMenu.style.display = "none";
 
   }
 
@@ -1283,7 +1290,8 @@ const PRODUCT_ID = "";
     payments: 'Forma de pagamento',
     orders: 'Meus pedidos',
     checkout: 'Carrinho',
-    cart: 'Meu carrinho'
+    cart: 'Meu carrinho',
+    admin: 'Painel Admin'
   };
 
   pageTitle.textContent = titles[view] || 'H2Sports';
@@ -1303,6 +1311,9 @@ const PRODUCT_ID = "";
   if(view === 'orders'){
     renderOrders();
   }
+      if(view === 'admin'){
+  renderAdminOrders();
+}
 
   const page = document.getElementById(`page-${view}`);
   if(page){
@@ -2174,10 +2185,25 @@ function prevStep(){
   cart.forEach(item => {
 
     orders.unshift({
-      ...item,
-      paymentStatus: "approved",
-      createdAt: new Date().toLocaleString('pt-BR')
-    });
+  ...item,
+
+  cliente: {
+    nome: document.getElementById('nome')?.value || '',
+    telefone: document.getElementById('telefone')?.value || '',
+    cep: document.getElementById('cep')?.value || '',
+    endereco: document.getElementById('endereco')?.value || '',
+    bairro: document.getElementById('bairro')?.value || '',
+    cidade: document.getElementById('cidade')?.value || '',
+    estado: document.getElementById('estado')?.value || '',
+    numeroCasa: document.getElementById('numero')?.value || '',
+    complemento: document.getElementById('complemento')?.value || '',
+    referencia: document.getElementById('referencia')?.value || ''
+  },
+
+  paymentStatus: "approved",
+
+  createdAt: new Date().toLocaleString('pt-BR')
+});
 
   });
             
@@ -2223,6 +2249,108 @@ function prevStep(){
     function calcularTotalCarrinho() {
   const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
   return cart.reduce((sum, item) => sum + item.price, 0);
+}
+
+    function renderAdminOrders(){
+
+  const container = document.getElementById('adminOrdersList');
+
+  const orders = JSON.parse(
+    localStorage.getItem('h2sports_orders') || '[]'
+  );
+
+  if(!orders.length){
+
+    container.innerHTML = `
+      <div class="empty-state">
+        Nenhum pedido encontrado.
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = orders.map(order => `
+
+    <div class="order-item">
+
+      <div class="order-title">
+        ${order.title}
+      </div>
+
+      <div class="order-meta">
+
+        <strong>Status:</strong>
+        ${order.paymentStatus || 'approved'}
+
+        <br><br>
+
+        <strong>Tamanho:</strong>
+        ${order.size || '-'}
+
+        <br>
+
+        <strong>Nome:</strong>
+        ${order.customName || '-'}
+
+        <br>
+
+        <strong>Número:</strong>
+        ${order.customNumber || '-'}
+
+        <br><br>
+
+        <strong>Cliente:</strong>
+        ${order.cliente?.nome || '-'}
+
+        <br>
+
+        <strong>Telefone:</strong>
+        ${order.cliente?.telefone || '-'}
+
+        <br><br>
+
+        <strong>Endereço:</strong>
+
+        <br>
+
+        ${order.cliente?.endereco || '-'},
+        ${order.cliente?.numeroCasa || '-'}
+
+        <br>
+
+        ${order.cliente?.bairro || '-'}
+
+        <br>
+
+        ${order.cliente?.cidade || '-'} -
+        ${order.cliente?.estado || '-'}
+
+        <br>
+
+        CEP:
+        ${order.cliente?.cep || '-'}
+
+        <br><br>
+
+        <strong>Complemento:</strong>
+        ${order.cliente?.complemento || '-'}
+
+        <br>
+
+        <strong>Referência:</strong>
+        ${order.cliente?.referencia || '-'}
+
+        <br><br>
+
+        <strong>Data:</strong>
+        ${order.createdAt}
+
+      </div>
+
+    </div>
+
+  `).join('');
 }
     
 
