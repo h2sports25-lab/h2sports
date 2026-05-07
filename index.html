@@ -1151,16 +1151,13 @@ window.loginGoogle = async function(){
 
 window.logout = async function(){
 
-  localStorage.removeItem("h2sports_cart");
+  await signOut(auth);
 
-  localStorage.removeItem("h2sports_orders");
+  currentUserEmail = "";
 
   updateCartCount();
 
-  await signOut(auth);
-
   showPage('home');
-
 }
 
   await signOut(auth);
@@ -1574,7 +1571,7 @@ function handleSearch(){
         createdAt: new Date().toLocaleString('pt-BR')
       };
 
-      const orders = JSON.parse(localStorage.getItem('h2sports_orders') || '[]');
+      const orders = JSON.parse(localStorage.getItem(getOrdersKey()) || '[]');
       orders.unshift(order);
       localStorage.setItem('h2sports_orders', JSON.stringify(orders));
 
@@ -1583,7 +1580,7 @@ function handleSearch(){
 
     function renderOrders(){
       const list = document.getElementById('ordersList');
-      const orders = JSON.parse(localStorage.getItem('h2sports_orders') || '[]');
+      const orders = JSON.parse(localStorage.getItem(getOrdersKey()) || '[]');
 
       if(!orders.length){
         list.innerHTML = `
@@ -1623,7 +1620,7 @@ function handleSearch(){
 
   pageTitle.textContent = 'Meu carrinho';
 
-  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
+  const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   const list = document.getElementById('cartList');
 
   if(!cart.length){
@@ -1670,15 +1667,15 @@ function handleSearch(){
   `;
 }
     function removeOrder(orderId){
-  const orders = JSON.parse(localStorage.getItem('h2sports_orders') || '[]');
+  const orders = JSON.parse(localStorage.getItem(getOrdersKey()) || '[]');
   const updatedOrders = orders.filter(order => order.id !== orderId);
-  localStorage.setItem('h2sports_orders', JSON.stringify(updatedOrders));
+ localStorage.setItem(getOrdersKey(), JSON.stringify(updatedOrders));
   renderOrders();
   showToast('Pedido removido com sucesso!');
 }
 
 function removeFromCart(itemId){
-  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
+  const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   const updatedCart = cart.filter(item => item.id !== itemId);
   localStorage.setItem('getCartKey()', JSON.stringify(updatedCart));
   renderCart();
@@ -1735,7 +1732,7 @@ updateCartCount();
     createdAt: new Date().toLocaleString('pt-BR')
   };
 
-  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
+  const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   cart.unshift(cartItem);
 
   localStorage.setItem('getCartKey()', JSON.stringify(cart));
@@ -1752,7 +1749,7 @@ function buyNow(productId){
 }
 
 function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
+  const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   const count = cart.length;
 
   const el = document.getElementById('cartCount');
@@ -1762,7 +1759,7 @@ function updateCartCount(){
 }
 
 function finalizarCompra(){
-  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
+ const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
 
   if(!cart.length){
     showToast('Carrinho vazio!');
@@ -1874,7 +1871,7 @@ function goToCheckout(){
 
 function renderCheckout(){
   const container = document.getElementById('checkoutContent');
-  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
+ const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
 
   let total = cart.reduce((sum, item) => sum + item.price, 0);
 
@@ -2210,11 +2207,11 @@ function prevStep(){
           if (result.status === "approved") {
 
   const cart = JSON.parse(
-    localStorage.getItem("h2sports_cart") || "[]"
+    localStorage.getItem(getCartKey()) || "[]"
   );
 
   const orders = JSON.parse(
-    localStorage.getItem("h2sports_orders") || "[]"
+    localStorage.getItem(getOrdersKey()) || "[]"
   );
 
   cart.forEach(item => {
@@ -2243,11 +2240,11 @@ function prevStep(){
   });
             
   localStorage.setItem(
-    "h2sports_orders",
-    JSON.stringify(orders)
-  );
+  getOrdersKey(),
+  JSON.stringify(orders)
+);
 
-  localStorage.removeItem("h2sports_cart");
+  localStorage.removeItem(getCartKey());
 
   updateCartCount();
 
@@ -2282,7 +2279,7 @@ function prevStep(){
 }
 
     function calcularTotalCarrinho() {
-  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
+  const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   return cart.reduce((sum, item) => sum + item.price, 0);
 }
 
