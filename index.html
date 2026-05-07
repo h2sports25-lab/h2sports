@@ -115,7 +115,6 @@
       transition:.2s ease;
       border:1px solid transparent;
       background:transparent;
-      white-space: nowrap;
     }
 
     .menu a:hover,
@@ -900,10 +899,6 @@
   border-radius: 2px;
 }
 
-    .admin-hidden{
-  display:none !important;
-}
-
 .checkout-steps {
   display: none; 
 }
@@ -944,7 +939,7 @@
         <a
   href="#"
   data-view="admin"
-  class="menu-link admin-hidden"
+  class="menu-link"
   id="adminMenu"
 >
   <span class="icon">🛠️</span>
@@ -1176,13 +1171,13 @@ onAuthStateChanged(auth, (user) => {
 
     if(user.email === ADMIN_EMAIL){
 
-      adminMenu.classList.remove("admin-hidden");
+      adminMenu.style.display = "flex";
 
       console.log("ADMIN LOGADO");
 
     }else{
 
-     adminMenu.classList.add("admin-hidden");
+     adminMenu.style.display = "none";
 
     }
 
@@ -1192,7 +1187,7 @@ onAuthStateChanged(auth, (user) => {
 
     logoutBtn.style.display = "none";
 
-    adminMenu.classList.add("admin-hidden");
+    adminMenu.style.display = "none";
 
   }
 
