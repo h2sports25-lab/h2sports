@@ -1131,6 +1131,8 @@ const provider = new GoogleAuthProvider();
 
 const ADMIN_EMAIL = "h2sports25@gmail.com";
 
+        let currentUserEmail = "";
+
 window.loginGoogle = async function(){
 
   try{
@@ -1177,6 +1179,8 @@ onAuthStateChanged(auth, (user) => {
 
     console.log("Usuário logado:", user.email);
 
+    currentUserEmail = user.email;
+
     loginBtn.style.display = "none";
 
     logoutBtn.style.display = "block";
@@ -1194,6 +1198,8 @@ onAuthStateChanged(auth, (user) => {
     }
 
   }else{
+
+    currentUserEmail = "";
 
     loginBtn.style.display = "block";
 
@@ -1617,7 +1623,7 @@ function handleSearch(){
 
   pageTitle.textContent = 'Meu carrinho';
 
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
   const list = document.getElementById('cartList');
 
   if(!cart.length){
@@ -1672,9 +1678,9 @@ function handleSearch(){
 }
 
 function removeFromCart(itemId){
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
   const updatedCart = cart.filter(item => item.id !== itemId);
-  localStorage.setItem('h2sports_cart', JSON.stringify(updatedCart));
+  localStorage.setItem('getCartKey()', JSON.stringify(updatedCart));
   renderCart();
   showToast('Produto removido do carrinho!');
 
@@ -1691,6 +1697,24 @@ updateCartCount();
         toast.classList.remove('show');
       }, 2200);
     }
+
+    function getCartKey(){
+
+  if(currentUserEmail){
+    return `h2sports_cart_${currentUserEmail}`;
+  }
+
+  return 'h2sports_cart_guest';
+}
+
+    function getOrdersKey(){
+
+  if(currentUserEmail){
+    return `h2sports_orders_${currentUserEmail}`;
+  }
+
+  return 'h2sports_orders_guest';
+}
 
     function addToCart(productId){
   const product = getProductById(productId);
@@ -1711,10 +1735,10 @@ updateCartCount();
     createdAt: new Date().toLocaleString('pt-BR')
   };
 
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
   cart.unshift(cartItem);
 
-  localStorage.setItem('h2sports_cart', JSON.stringify(cart));
+  localStorage.setItem('getCartKey()', JSON.stringify(cart));
 
   showToast('Produto adicionado ao carrinho!');
 
@@ -1728,7 +1752,7 @@ function buyNow(productId){
 }
 
 function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
   const count = cart.length;
 
   const el = document.getElementById('cartCount');
@@ -1738,7 +1762,7 @@ function updateCartCount(){
 }
 
 function finalizarCompra(){
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
 
   if(!cart.length){
     showToast('Carrinho vazio!');
@@ -1850,7 +1874,7 @@ function goToCheckout(){
 
 function renderCheckout(){
   const container = document.getElementById('checkoutContent');
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
 
   let total = cart.reduce((sum, item) => sum + item.price, 0);
 
@@ -2018,7 +2042,7 @@ function renderCheckout(){
   `;
 
   setTimeout(() => {
-    localStorage.removeItem('h2sports_cart');
+    localStorage.removeItem('getCartKey()');
     updateCartCount();
   }, 300);
 }
@@ -2258,7 +2282,7 @@ function prevStep(){
 }
 
     function calcularTotalCarrinho() {
-  const cart = JSON.parse(localStorage.getItem('h2sports_cart') || '[]');
+  const cart = JSON.parse(localStorage.getItem('getCartKey()') || '[]');
   return cart.reduce((sum, item) => sum + item.price, 0);
 }
 
@@ -2266,9 +2290,19 @@ function prevStep(){
 
   const container = document.getElementById('adminOrdersList');
 
-  const orders = JSON.parse(
-    localStorage.getItem('h2sports_orders') || '[]'
-  );
+  let orders = [];
+
+for(let key in localStorage){
+
+  if(key.startsWith('h2sports_orders_')){
+
+    const userOrders = JSON.parse(
+      localStorage.getItem(key) || '[]'
+    );
+
+    orders = orders.concat(userOrders);
+  }
+}
 
   if(!orders.length){
 
