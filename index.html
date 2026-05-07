@@ -1160,9 +1160,6 @@ window.logout = async function(){
   showPage('home');
 }
 
-  await signOut(auth);
-
-}
 
 onAuthStateChanged(auth, (user) => {
 
@@ -1573,7 +1570,7 @@ function handleSearch(){
 
       const orders = JSON.parse(localStorage.getItem(getOrdersKey()) || '[]');
       orders.unshift(order);
-      localStorage.setItem('h2sports_orders', JSON.stringify(orders));
+      localStorage.setItem(getOrdersKey(), JSON.stringify(orders));
 
       showToast('Pedido salvo com sucesso!');
     }
@@ -1677,7 +1674,7 @@ function handleSearch(){
 function removeFromCart(itemId){
   const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   const updatedCart = cart.filter(item => item.id !== itemId);
-  localStorage.setItem('getCartKey()', JSON.stringify(updatedCart));
+  localStorage.setItem(getCartKey(), JSON.stringify(updatedCart));
   renderCart();
   showToast('Produto removido do carrinho!');
 
@@ -1735,7 +1732,7 @@ updateCartCount();
   const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   cart.unshift(cartItem);
 
-  localStorage.setItem('getCartKey()', JSON.stringify(cart));
+  localStorage.setItem(getCartKey(), JSON.stringify(cart));
 
   showToast('Produto adicionado ao carrinho!');
 
@@ -2039,7 +2036,7 @@ function renderCheckout(){
   `;
 
   setTimeout(() => {
-    localStorage.removeItem('getCartKey()');
+    localStorage.removeItem(getCartKey());
     updateCartCount();
   }, 300);
 }
