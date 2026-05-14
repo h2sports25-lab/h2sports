@@ -2205,16 +2205,13 @@ function prevStep(){
       result.payment_method_id === "pix"
     ) {
 
-      const qrData =
-        result.point_of_interaction?.transaction_data;
+      const qrCode = result.qr_code;
+const qrCodeBase64 = result.qr_code_base64;
 
-      if (!qrData) {
-        alert("QR Code Pix não encontrado");
-        return;
-      }
-
-      const qrCode = qrData.qr_code;
-      const qrCodeBase64 = qrData.qr_code_base64;
+if (!qrCode || !qrCodeBase64) {
+  alert("QR Code Pix não encontrado");
+  return;
+}
 
       document.getElementById("checkoutContent").innerHTML = `
         <div class="panel">
