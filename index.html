@@ -2182,141 +2182,150 @@ function prevStep(){
 
       onSubmit: async ({ formData }) => {
 
-        try {
+  try {
 
-          console.log(formData);
-          const response = await fetch(
-            "https://h2sports-backend-1.onrender.com/process_payment",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(formData)
-            }
-          );
+    const response = await fetch(
+      "https://h2sports-backend-1.onrender.com/process_payment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      }
+    );
 
-          const result = await response.json();
+    const result = await response.json();
 
-          console.log(result);
+    console.log(result);
 
-          if (formData.payment_method_id === "pix") {
+    // PIX
+    if (
+      formData.payment_method_id === "pix" ||
+      result.payment_method_id === "pix"
+    ) {
 
-  const qrCode =
-    result.point_of_interaction.transaction_data.qr_code;
+      const qrData =
+        result.point_of_interaction?.transaction_data;
 
-  const qrCodeBase64 =
-    result.point_of_interaction.transaction_data.qr_code_base64;
+      if (!qrData) {
+        alert("QR Code Pix não encontrado");
+        return;
+      }
 
-  document.getElementById("checkoutContent").innerHTML = `
-    <div class="panel">
+      const qrCode = qrData.qr_code;
+      const qrCodeBase64 = qrData.qr_code_base64;
 
-      <h3>Pagamento via Pix</h3>
+      document.getElementById("checkoutContent").innerHTML = `
+        <div class="panel">
 
-      <p style="margin-bottom:16px;">
-        Escaneie o QR Code ou copie o código Pix abaixo.
-      </p>
+          <h3>Pagamento via Pix</h3>
 
-      <img
-        src="data:image/png;base64,${qrCodeBase64}"
-        style="
-          width:260px;
-          max-width:100%;
-          margin:20px auto;
-          display:block;
-          border-radius:16px;
-          background:white;
-          padding:12px;
-        "
-      >
+          <p style="margin-bottom:16px;">
+            Escaneie o QR Code abaixo ou copie o código Pix.
+          </p>
 
-      <textarea
-        readonly
-        style="
-          width:100%;
-          height:120px;
-          padding:12px;
-          border-radius:12px;
-          margin-bottom:12px;
-          background:#17233e;
-          color:white;
-          border:1px solid rgba(255,255,255,.1);
-        "
-      >${qrCode}</textarea>
+          <img
+            src="data:image/png;base64,${qrCodeBase64}"
+            style="
+              width:260px;
+              max-width:100%;
+              margin:20px auto;
+              display:block;
+              background:white;
+              padding:12px;
+              border-radius:16px;
+            "
+          >
 
-      <button
-        class="btn btn-primary"
-        onclick="navigator.clipboard.writeText('${qrCode}')"
-      >
-        Copiar código Pix
-      </button>
+          <textarea
+            readonly
+            style="
+              width:100%;
+              height:120px;
+              padding:12px;
+              border-radius:12px;
+              background:#17233e;
+              color:white;
+              border:1px solid rgba(255,255,255,.1);
+              margin-bottom:12px;
+            "
+          >${qrCode}</textarea>
 
-    </div>
-  `;
+          <button
+            class="btn btn-primary"
+            onclick="navigator.clipboard.writeText(\`${qrCode}\`)"
+          >
+            Copiar código Pix
+          </button>
 
-  return;
-}
+        </div>
+      `;
 
-          if (result.status === "approved") {
+      return;
+    }
 
-  const cart = JSON.parse(
-    localStorage.getItem(getCartKey()) || "[]"
-  );
+    // CARTÃO APROVADO
+    if (result.status === "approved") {
 
-  const orders = JSON.parse(
-    localStorage.getItem(getOrdersKey()) || "[]"
-  );
+      const cart = JSON.parse(
+        localStorage.getItem(getCartKey()) || "[]"
+      );
 
-  cart.forEach(item => {
+      const orders = JSON.parse(
+        localStorage.getItem(getOrdersKey()) || "[]"
+      );
 
-    orders.unshift({
-  ...item,
+      cart.forEach(item => {
 
-  cliente: {
-    nome: document.getElementById('nome')?.value || '',
-    telefone: document.getElementById('telefone')?.value || '',
-    cep: document.getElementById('cep')?.value || '',
-    endereco: document.getElementById('endereco')?.value || '',
-    bairro: document.getElementById('bairro')?.value || '',
-    cidade: document.getElementById('cidade')?.value || '',
-    estado: document.getElementById('estado')?.value || '',
-    numeroCasa: document.getElementById('numero')?.value || '',
-    complemento: document.getElementById('complemento')?.value || '',
-    referencia: document.getElementById('referencia')?.value || ''
-  },
+        orders.unshift({
+          ...item,
 
-  paymentStatus: "approved",
+          cliente: {
+            nome: document.getElementById('nome')?.value || '',
+            telefone: document.getElementById('telefone')?.value || '',
+            cep: document.getElementById('cep')?.value || '',
+            endereco: document.getElementById('endereco')?.value || '',
+            bairro: document.getElementById('bairro')?.value || '',
+            cidade: document.getElementById('cidade')?.value || '',
+            estado: document.getElementById('estado')?.value || '',
+            numeroCasa: document.getElementById('numero')?.value || '',
+            complemento: document.getElementById('complemento')?.value || '',
+            referencia: document.getElementById('referencia')?.value || ''
+          },
 
-  createdAt: new Date().toLocaleString('pt-BR')
-});
+          paymentStatus: "approved",
 
-  });
-            
-  localStorage.setItem(
-  getOrdersKey(),
-  JSON.stringify(orders)
-);
+          createdAt: new Date().toLocaleString('pt-BR')
+        });
 
-  localStorage.removeItem(getCartKey());
+      });
 
-  updateCartCount();
+      localStorage.setItem(
+        getOrdersKey(),
+        JSON.stringify(orders)
+      );
 
-  checkoutStep = 4;
+      localStorage.removeItem(getCartKey());
 
-  renderCheckout();
+      updateCartCount();
 
-} else {
+      checkoutStep = 4;
 
-            alert("Pagamento não aprovado: " + result.status_detail);
-          }
+      renderCheckout();
 
-        } catch (error) {
+    } else {
 
-          console.error(error);
+      alert("Pagamento não aprovado");
+    }
 
-          alert("Erro ao processar pagamento");
-        }
-      },
+  } catch (error) {
+
+    console.error(error);
+
+    alert("Erro ao processar pagamento");
+  }
+},
 
       onError: (error) => {
         console.error(error);
