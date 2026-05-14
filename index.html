@@ -2200,6 +2200,63 @@ function prevStep(){
 
           console.log(result);
 
+          if (formData.payment_method_id === "pix") {
+
+  const qrCode =
+    result.point_of_interaction.transaction_data.qr_code;
+
+  const qrCodeBase64 =
+    result.point_of_interaction.transaction_data.qr_code_base64;
+
+  document.getElementById("checkoutContent").innerHTML = `
+    <div class="panel">
+
+      <h3>Pagamento via Pix</h3>
+
+      <p style="margin-bottom:16px;">
+        Escaneie o QR Code ou copie o código Pix abaixo.
+      </p>
+
+      <img
+        src="data:image/png;base64,${qrCodeBase64}"
+        style="
+          width:260px;
+          max-width:100%;
+          margin:20px auto;
+          display:block;
+          border-radius:16px;
+          background:white;
+          padding:12px;
+        "
+      >
+
+      <textarea
+        readonly
+        style="
+          width:100%;
+          height:120px;
+          padding:12px;
+          border-radius:12px;
+          margin-bottom:12px;
+          background:#17233e;
+          color:white;
+          border:1px solid rgba(255,255,255,.1);
+        "
+      >${qrCode}</textarea>
+
+      <button
+        class="btn btn-primary"
+        onclick="navigator.clipboard.writeText('${qrCode}')"
+      >
+        Copiar código Pix
+      </button>
+
+    </div>
+  `;
+
+  return;
+}
+
           if (result.status === "approved") {
 
   const cart = JSON.parse(
