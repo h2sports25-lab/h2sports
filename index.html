@@ -2204,7 +2204,8 @@ function prevStep(){
 
     const result = await response.json();
     console.log(result);
- const paymentId = result.id;
+ const paymentId = result.id || result.data?.id
+    console.log("PAYMENT ID:", paymentId);
 
 // PIX
 if (
