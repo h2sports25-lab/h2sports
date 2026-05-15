@@ -2191,14 +2191,21 @@ function prevStep(){
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+
+  ...formData,
+
+  items: JSON.parse(
+    localStorage.getItem(getCartKey()) || "[]"
+  )
+})
       }
     );
 
     const result = await response.json();
-
     console.log(result);
-
+ const paymentId = result.id;
+    
     // PIX
     if (
       formData.payment_method_id === "pix" ||
@@ -2215,7 +2222,7 @@ if (!qrCode || !qrCodeBase64) {
   alert(
     JSON.stringify(result, null, 2)
   );
-
+verificarPagamentoPix(paymentId);
   return;
 }
 
@@ -2459,7 +2466,77 @@ for(let key in localStorage){
 
   `).join('');
 }
-    
+    async function verificarPagamentoPix(paymentId){
+
+  const interval = setInterval(async () => {
+
+    try{
+
+      const response = await fetch(
+        `https://h2sports-backend-1.onrender.com/check-payment/${paymentId}`
+      );
+
+      const data = await response.json();
+
+      console.log("STATUS PIX:", data);
+
+      if(data.status === "approved"){
+
+        clearInterval(interval);
+
+        const cart = JSON.parse(
+          localStorage.getItem(getCartKey()) || "[]"
+        );
+
+        const orders = JSON.parse(
+          localStorage.getItem(getOrdersKey()) || "[]"
+        );
+
+        cart.forEach(item => {
+
+          orders.unshift({
+            ...item,
+
+            cliente: {
+              nome: document.getElementById('nome')?.value || '',
+              telefone: document.getElementById('telefone')?.value || '',
+              cep: document.getElementById('cep')?.value || '',
+              endereco: document.getElementById('endereco')?.value || '',
+              bairro: document.getElementById('bairro')?.value || '',
+              cidade: document.getElementById('cidade')?.value || '',
+              estado: document.getElementById('estado')?.value || '',
+              numeroCasa: document.getElementById('numero')?.value || '',
+              complemento: document.getElementById('complemento')?.value || '',
+              referencia: document.getElementById('referencia')?.value || ''
+            },
+
+            paymentStatus: "approved",
+
+            createdAt: new Date().toLocaleString('pt-BR')
+          });
+
+        });
+
+        localStorage.setItem(
+          getOrdersKey(),
+          JSON.stringify(orders)
+        );
+
+        localStorage.removeItem(getCartKey());
+
+        updateCartCount();
+
+        checkoutStep = 4;
+
+        renderCheckout();
+      }
+
+    }catch(e){
+      console.error(e);
+    }
+
+  }, 5000);
+}
 
   init();
 </script>  
