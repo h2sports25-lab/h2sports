@@ -1745,6 +1745,40 @@ function buyNow(productId){
   goToCheckout()
 }
 
+ function finalizarCompra(){
+ const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
+
+  if(!cart.length){
+    showToast('Carrinho vazio!');
+    return;
+  }
+
+  let total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  const chavePix = "SEUEMAIL@GMAIL.COM"; // 🔥 SUA CHAVE PIX
+
+  document.getElementById('cartList').innerHTML = `
+    <div class="panel">
+      <h3>Pagamento via Pix</h3>
+
+      <p><strong>Valor:</strong> ${formatPrice(total)}</p>
+
+      <p><strong>Chave Pix:</strong></p>
+      <p style="font-size:18px; word-break:break-all;">
+        ${chavePix}
+      </p>
+
+      <button class="btn btn-primary" onclick="copiarPix('${chavePix}')">
+        Copiar chave Pix
+      </button>
+
+      <p style="margin-top:12px;">
+        Após o pagamento, envie o comprovante para confirmação.
+      </p>
+    </div>
+  `;
+}   
+
 function updateCartCount(){
   const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
   const count = cart.length;
