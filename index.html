@@ -1755,40 +1755,6 @@ function updateCartCount(){
   }
 }
 
-function finalizarCompra(){
- const cart = JSON.parse(localStorage.getItem(getCartKey()) || '[]');
-
-  if(!cart.length){
-    showToast('Carrinho vazio!');
-    return;
-  }
-
-  let total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  const chavePix = "SEUEMAIL@GMAIL.COM"; // 🔥 SUA CHAVE PIX
-
-  document.getElementById('cartList').innerHTML = `
-    <div class="panel">
-      <h3>Pagamento via Pix</h3>
-
-      <p><strong>Valor:</strong> ${formatPrice(total)}</p>
-
-      <p><strong>Chave Pix:</strong></p>
-      <p style="font-size:18px; word-break:break-all;">
-        ${chavePix}
-      </p>
-
-      <button class="btn btn-primary" onclick="copiarPix('${chavePix}')">
-        Copiar chave Pix
-      </button>
-
-      <p style="margin-top:12px;">
-        Após o pagamento, envie o comprovante para confirmação.
-      </p>
-    </div>
-  `;
-}
-
     function init(){
   renderProducts();
 
@@ -2204,7 +2170,13 @@ function prevStep(){
 
     const result = await response.json();
     console.log(result);
- const paymentId = result.id || result.data?.id
+    
+const paymentId = result.id || result.payment_id || result.data?.id;
+
+if (!paymentId) {
+  alert("Erro: paymentId não retornado pelo backend");
+  return;
+}
     console.log("PAYMENT ID:", paymentId);
 
 // PIX
@@ -2322,11 +2294,12 @@ if (
 
       localStorage.removeItem(getCartKey());
 
-      updateCartCount();
+updateCartCount();
+renderCart();
 
-      checkoutStep = 4;
-
-      renderCheckout();
+showToast("Pagamento aprovado!");
+checkoutStep = 4;
+renderCheckout();
 
     } else {
 
@@ -2533,6 +2506,12 @@ for(let key in localStorage){
         checkoutStep = 4;
 
         renderCheckout();
+
+   renderOrders();
+renderCart();
+showPage('orders');
+showToast("Pagamento aprovado!");
+        
       }
 
     }catch(e){
