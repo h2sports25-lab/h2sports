@@ -2208,8 +2208,14 @@ function prevStep(){
       const qrCode = result.qr_code;
 const qrCodeBase64 = result.qr_code_base64;
 
+console.log("RESULTADO PIX:", result);
+
 if (!qrCode || !qrCodeBase64) {
-  alert("QR Code Pix não encontrado");
+
+  alert(
+    JSON.stringify(result, null, 2)
+  );
+
   return;
 }
 
