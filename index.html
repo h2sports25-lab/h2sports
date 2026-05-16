@@ -2227,8 +2227,9 @@ console.log("PAYMENT ID:", paymentId);
 // PIX
 if (
   formData.payment_method_id === "pix" ||
+  formData.paymentMethodId === "pix" ||
   result.payment_method_id === "pix"
-) {
+)
 
   const qrCode =
   result.point_of_interaction
@@ -2502,7 +2503,7 @@ for(let key in localStorage){
     try{
 
       const response = await fetch(
-        `https://h2sports-backend.onrender.com/check-payment/${paymentId}`
+        `https://h2sports-backend-1.onrender.com/check-payment/${paymentId}`
       );
 
       const data = await response.json();
