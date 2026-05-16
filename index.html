@@ -2248,12 +2248,10 @@ const qrCodeBase64 =
 
   if (!qrCode || !qrCodeBase64) {
 
-    alert(
-      JSON.stringify(result, null, 2)
-    );
+  alert("Erro ao gerar QR Code Pix");
 
-    return;
-  }
+  return;
+}
 
   document.getElementById("checkoutContent").innerHTML = `
     <div class="panel">
